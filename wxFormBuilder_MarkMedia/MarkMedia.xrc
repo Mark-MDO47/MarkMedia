@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxFrame" name="MainFrame">
+		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
+		<size>1245,1193</size>
+		<title></title>
+		<centered>1</centered>
+		<aui_managed>0</aui_managed>
+		<object class="wxPanel" name="m_panel1">
+			<style>wxTAB_TRAVERSAL</style>
+			<tooltip>Video is displayed here</tooltip>
+			<object class="wxBoxSizer">
+				<orient>wxVERTICAL</orient>
+				<object class="sizeritem">
+					<option>0</option>
+					<flag>wxALL|wxEXPAND</flag>
+					<border>5</border>
+					<object class="wxStaticText" name="m_staticTextStatus">
+						<tooltip>Status is displayed here</tooltip>
+						<label>Status: ...</label>
+						<wrap>-1</wrap>
+					</object>
+				</object>
+				<object class="sizeritem">
+					<option>1</option>
+					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+					<border>5</border>
+					<object class="wxNotebook" name="m_notebookMediaCtrl" />
+				</object>
+				<object class="sizeritem">
+					<option>0</option>
+					<flag>wxALIGN_CENTER_HORIZONTAL</flag>
+					<border>5</border>
+					<object class="wxBoxSizer">
+						<orient>wxHORIZONTAL</orient>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxRadioBox" name="m_radioBox1">
+								<style>wxRA_SPECIFY_COLS</style>
+								<label>wxRadioBox</label>
+								<selection>0</selection>
+								<content>
+									<item>Pix</item>
+									<item>Movies</item>
+								</content>
+								<dimension>2</dimension>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonPrev10">
+								<tooltip>10 Previous</tooltip>
+								<label>|&lt;&lt;&lt;</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonPrev">
+								<tooltip>Previous</tooltip>
+								<label>|&lt;</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonPlay">
+								<tooltip>Play</tooltip>
+								<label>&gt;</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonStop">
+								<tooltip>Stop</tooltip>
+								<label>&gt;][&lt;</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonNext">
+								<tooltip>Next</tooltip>
+								<label>&gt;|</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonNext10">
+								<tooltip>10 Next</tooltip>
+								<label>&gt;&gt;&gt;|</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonEnterVidNum">
+								<tooltip>Enter video number</tooltip>
+								<label>Enter...</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonLouder">
+								<tooltip>Louder</tooltip>
+								<label>^^^</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL</flag>
+							<border>5</border>
+							<object class="wxButton" name="m_buttonSofter">
+								<tooltip>Softer</tooltip>
+								<label>vvv</label>
+								<default>0</default>
+								<markup>0</markup>
+								<bitmap />
+							</object>
+						</object>
+					</object>
+				</object>
+				<object class="sizeritem">
+					<option>0</option>
+					<flag>wxALL|wxEXPAND</flag>
+					<border>5</border>
+					<object class="wxTextCtrl" name="m_textCtrl1">
+						<tooltip>Enter/Edit Comment</tooltip>
+						<value></value>
+					</object>
+				</object>
+				<object class="sizeritem">
+					<option>0</option>
+					<flag>wxALL|wxEXPAND</flag>
+					<border>5</border>
+					<object class="wxListBox" name="m_listBoxVidComments">
+						<style>wxLB_ALWAYS_SB|wxLB_HSCROLL|wxLB_SINGLE</style>
+						<tooltip>List of existing Video txt comments</tooltip>
+						<content />
+					</object>
+				</object>
+			</object>
+		</object>
+		<object class="wxMenuBar" name="m_menubarMainFrame">
+			<label>MyMenuBar</label>
+			<object class="wxMenu" name="m_menuFile">
+				<label>File</label>
+				<object class="wxMenuItem" name="m_menuItemFileOpen">
+					<label>Open Video txt...</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="m_menuItemFileSave">
+					<label>Save Video txt...</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="m_menuItemFileSaveAs">
+					<label>Save As Video txt...</label>
+					<help></help>
+				</object>
+			</object>
+			<object class="wxMenu" name="m_menuHelp">
+				<label>Help</label>
+				<object class="wxMenuItem" name="m_menuItemHelpAbout">
+					<label>About...</label>
+					<help></help>
+				</object>
+			</object>
+		</object>
+	</object>
+</resource>

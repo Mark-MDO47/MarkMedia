@@ -16,7 +16,6 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/notebook.h>
-#include <wx/radiobox.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -42,13 +41,12 @@ class MainFrame : public wxFrame
 		wxPanel* m_panel1;
 		wxStaticText* m_staticTextStatus;
 		wxNotebook* m_notebookMediaCtrl;
-		wxRadioBox* m_radioBox1;
-		wxButton* m_buttonPrev10;
+		wxButton* m_buttonPrevfile;
 		wxButton* m_buttonPrev;
 		wxButton* m_buttonPlay;
-		wxButton* m_buttonStop;
+		wxButton* m_buttonPause;
 		wxButton* m_buttonNext;
-		wxButton* m_buttonNext10;
+		wxButton* m_buttonNextFile;
 		wxButton* m_buttonEnterVidNum;
 		wxButton* m_buttonLouder;
 		wxButton* m_buttonSofter;
@@ -59,12 +57,12 @@ class MainFrame : public wxFrame
 		wxMenu* m_menuHelp;
 
 		// Virtual event handlers, overide them in your derived class
-		virtual void onBtnPrev10( wxCommandEvent& event ) { event.Skip(); }
+		virtual void onBtnPrevFile( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnPrev( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnPlay( wxCommandEvent& event ) { event.Skip(); }
-		virtual void onBtnStop( wxCommandEvent& event ) { event.Skip(); }
+		virtual void onBtnPause( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnNext( wxCommandEvent& event ) { event.Skip(); }
-		virtual void onBtnNext10( wxCommandEvent& event ) { event.Skip(); }
+		virtual void onBtnNextFile( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnEnterVidNum( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnLouder( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnSofter( wxCommandEvent& event ) { event.Skip(); }
@@ -73,6 +71,8 @@ class MainFrame : public wxFrame
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSaveAs( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFileQuit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onHelpAbout( wxCommandEvent& event ) { event.Skip(); }
 
 

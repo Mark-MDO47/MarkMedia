@@ -40,18 +40,13 @@ class MainFrame extends wxFrame {
 
 		$bSizer3 = new wxBoxSizer( wxHORIZONTAL );
 
-		$m_radioBox1Choices = array( "Pix", "Movies" );
-		$this->m_radioBox1 = new wxRadioBox( $this->m_panel1, wxID_ANY, "wxRadioBox", wxDefaultPosition, wxDefaultSize, $m_radioBox1Choices, 2, wxRA_SPECIFY_COLS );
-		$this->m_radioBox1->SetSelection( 0 );
-		$bSizer3->Add( $this->m_radioBox1, 0, wxALL, 5 );
+		$this->m_buttonPrevfile = new wxButton( $this->m_panel1, wxID_ANY, "|<textfile", wxDefaultPosition, wxDefaultSize, 0 );
+		$this->m_buttonPrevfile->SetToolTip( "Previous in text file" );
 
-		$this->m_buttonPrev10 = new wxButton( $this->m_panel1, wxID_ANY, "|<<<", wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_buttonPrev10->SetToolTip( "10 Previous" );
-
-		$bSizer3->Add( $this->m_buttonPrev10, 0, wxALL, 5 );
+		$bSizer3->Add( $this->m_buttonPrevfile, 0, wxALL, 5 );
 
 		$this->m_buttonPrev = new wxButton( $this->m_panel1, wxID_ANY, "|<", wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_buttonPrev->SetToolTip( "Previous" );
+		$this->m_buttonPrev->SetToolTip( "Previous media file" );
 
 		$bSizer3->Add( $this->m_buttonPrev, 0, wxALL, 5 );
 
@@ -60,32 +55,32 @@ class MainFrame extends wxFrame {
 
 		$bSizer3->Add( $this->m_buttonPlay, 0, wxALL, 5 );
 
-		$this->m_buttonStop = new wxButton( $this->m_panel1, wxID_ANY, ">][<", wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_buttonStop->SetToolTip( "Stop" );
+		$this->m_buttonPause = new wxButton( $this->m_panel1, wxID_ANY, ">][<", wxDefaultPosition, wxDefaultSize, 0 );
+		$this->m_buttonPause->SetToolTip( "Pause" );
 
-		$bSizer3->Add( $this->m_buttonStop, 0, wxALL, 5 );
+		$bSizer3->Add( $this->m_buttonPause, 0, wxALL, 5 );
 
 		$this->m_buttonNext = new wxButton( $this->m_panel1, wxID_ANY, ">|", wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_buttonNext->SetToolTip( "Next" );
+		$this->m_buttonNext->SetToolTip( "Next media file" );
 
 		$bSizer3->Add( $this->m_buttonNext, 0, wxALL, 5 );
 
-		$this->m_buttonNext10 = new wxButton( $this->m_panel1, wxID_ANY, ">>>|", wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_buttonNext10->SetToolTip( "10 Next" );
+		$this->m_buttonNextFile = new wxButton( $this->m_panel1, wxID_ANY, "textfile>|", wxDefaultPosition, wxDefaultSize, 0 );
+		$this->m_buttonNextFile->SetToolTip( "Next in text file" );
 
-		$bSizer3->Add( $this->m_buttonNext10, 0, wxALL, 5 );
+		$bSizer3->Add( $this->m_buttonNextFile, 0, wxALL, 5 );
 
-		$this->m_buttonEnterVidNum = new wxButton( $this->m_panel1, wxID_ANY, "Enter...", wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_buttonEnterVidNum->SetToolTip( "Enter video number" );
+		$this->m_buttonEnterVidNum = new wxButton( $this->m_panel1, wxID_ANY, "Enter #...", wxDefaultPosition, wxDefaultSize, 0 );
+		$this->m_buttonEnterVidNum->SetToolTip( "Enter media number" );
 
 		$bSizer3->Add( $this->m_buttonEnterVidNum, 0, wxALL, 5 );
 
-		$this->m_buttonLouder = new wxButton( $this->m_panel1, wxID_ANY, "^^^", wxDefaultPosition, wxDefaultSize, 0 );
+		$this->m_buttonLouder = new wxButton( $this->m_panel1, wxID_ANY, "Louder", wxDefaultPosition, wxDefaultSize, 0 );
 		$this->m_buttonLouder->SetToolTip( "Louder" );
 
 		$bSizer3->Add( $this->m_buttonLouder, 0, wxALL, 5 );
 
-		$this->m_buttonSofter = new wxButton( $this->m_panel1, wxID_ANY, "vvv", wxDefaultPosition, wxDefaultSize, 0 );
+		$this->m_buttonSofter = new wxButton( $this->m_panel1, wxID_ANY, "Softer", wxDefaultPosition, wxDefaultSize, 0 );
 		$this->m_buttonSofter->SetToolTip( "Softer" );
 
 		$bSizer3->Add( $this->m_buttonSofter, 0, wxALL, 5 );
@@ -125,6 +120,12 @@ class MainFrame extends wxFrame {
 		$this->m_menuItemFileSaveAs = new wxMenuItem( $this->m_menuFile, wxID_ANY, "Save As Video txt...", wxEmptyString, wxITEM_NORMAL );
 		$this->m_menuFile->Append( $this->m_menuItemFileSaveAs );
 
+		$this->m_menuItemQuit = new wxMenuItem( $this->m_menuFile, wxID_ANY, "Quit without save...", wxEmptyString, wxITEM_NORMAL );
+		$this->m_menuFile->Append( $this->m_menuItemQuit );
+
+		$this->m_menuItemeExit = new wxMenuItem( $this->m_menuFile, wxID_ANY, "Exit and save", wxEmptyString, wxITEM_NORMAL );
+		$this->m_menuFile->Append( $this->m_menuItemeExit );
+
 		$this->m_menubarMainFrame->Append( $this->m_menuFile, "File" );
 
 		$this->m_menuHelp = new wxMenu();
@@ -139,12 +140,12 @@ class MainFrame extends wxFrame {
 		$this->Centre( wxBOTH );
 
 		// Connect Events
-		$this->m_buttonPrev10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnPrev10") );
+		$this->m_buttonPrevfile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnPrevFile") );
 		$this->m_buttonPrev->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnPrev") );
 		$this->m_buttonPlay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnPlay") );
-		$this->m_buttonStop->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnStop") );
+		$this->m_buttonPause->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnPause") );
 		$this->m_buttonNext->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnNext") );
-		$this->m_buttonNext10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnNext10") );
+		$this->m_buttonNextFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnNextFile") );
 		$this->m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnEnterVidNum") );
 		$this->m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnLouder") );
 		$this->m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnSofter") );
@@ -153,6 +154,8 @@ class MainFrame extends wxFrame {
 		$this->Connect( $this->m_menuItemFileOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileOpen") );
 		$this->Connect( $this->m_menuItemFileSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSave") );
 		$this->Connect( $this->m_menuItemFileSaveAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSaveAs") );
+		$this->Connect( $this->m_menuItemQuit->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileQuit") );
+		$this->Connect( $this->m_menuItemeExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileExit") );
 		$this->Connect( $this->m_menuItemHelpAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onHelpAbout") );
 	}
 
@@ -162,7 +165,7 @@ class MainFrame extends wxFrame {
 
 
 	// Virtual event handlers, overide them in your derived class
-	function onBtnPrev10( $event ){
+	function onBtnPrevFile( $event ){
 		$event->Skip();
 	}
 
@@ -174,7 +177,7 @@ class MainFrame extends wxFrame {
 		$event->Skip();
 	}
 
-	function onBtnStop( $event ){
+	function onBtnPause( $event ){
 		$event->Skip();
 	}
 
@@ -182,7 +185,7 @@ class MainFrame extends wxFrame {
 		$event->Skip();
 	}
 
-	function onBtnNext10( $event ){
+	function onBtnNextFile( $event ){
 		$event->Skip();
 	}
 
@@ -215,6 +218,14 @@ class MainFrame extends wxFrame {
 	}
 
 	function onFileSaveAs( $event ){
+		$event->Skip();
+	}
+
+	function OnFileQuit( $event ){
+		$event->Skip();
+	}
+
+	function OnFileExit( $event ){
 		$event->Skip();
 	}
 

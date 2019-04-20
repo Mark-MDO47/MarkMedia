@@ -37,19 +37,13 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
 
-	wxString m_radioBox1Choices[] = { wxT("Pix"), wxT("Movies") };
-	int m_radioBox1NChoices = sizeof( m_radioBox1Choices ) / sizeof( wxString );
-	m_radioBox1 = new wxRadioBox( m_panel1, wxID_ANY, wxT("wxRadioBox"), wxDefaultPosition, wxDefaultSize, m_radioBox1NChoices, m_radioBox1Choices, 2, wxRA_SPECIFY_COLS );
-	m_radioBox1->SetSelection( 0 );
-	bSizer3->Add( m_radioBox1, 0, wxALL, 5 );
+	m_buttonPrevfile = new wxButton( m_panel1, wxID_ANY, wxT("|<textfile"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonPrevfile->SetToolTip( wxT("Previous in text file") );
 
-	m_buttonPrev10 = new wxButton( m_panel1, wxID_ANY, wxT("|<<<"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonPrev10->SetToolTip( wxT("10 Previous") );
-
-	bSizer3->Add( m_buttonPrev10, 0, wxALL, 5 );
+	bSizer3->Add( m_buttonPrevfile, 0, wxALL, 5 );
 
 	m_buttonPrev = new wxButton( m_panel1, wxID_ANY, wxT("|<"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonPrev->SetToolTip( wxT("Previous") );
+	m_buttonPrev->SetToolTip( wxT("Previous media file") );
 
 	bSizer3->Add( m_buttonPrev, 0, wxALL, 5 );
 
@@ -58,32 +52,32 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	bSizer3->Add( m_buttonPlay, 0, wxALL, 5 );
 
-	m_buttonStop = new wxButton( m_panel1, wxID_ANY, wxT(">][<"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonStop->SetToolTip( wxT("Stop") );
+	m_buttonPause = new wxButton( m_panel1, wxID_ANY, wxT(">][<"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonPause->SetToolTip( wxT("Pause") );
 
-	bSizer3->Add( m_buttonStop, 0, wxALL, 5 );
+	bSizer3->Add( m_buttonPause, 0, wxALL, 5 );
 
 	m_buttonNext = new wxButton( m_panel1, wxID_ANY, wxT(">|"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonNext->SetToolTip( wxT("Next") );
+	m_buttonNext->SetToolTip( wxT("Next media file") );
 
 	bSizer3->Add( m_buttonNext, 0, wxALL, 5 );
 
-	m_buttonNext10 = new wxButton( m_panel1, wxID_ANY, wxT(">>>|"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonNext10->SetToolTip( wxT("10 Next") );
+	m_buttonNextFile = new wxButton( m_panel1, wxID_ANY, wxT("textfile>|"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonNextFile->SetToolTip( wxT("Next in text file") );
 
-	bSizer3->Add( m_buttonNext10, 0, wxALL, 5 );
+	bSizer3->Add( m_buttonNextFile, 0, wxALL, 5 );
 
-	m_buttonEnterVidNum = new wxButton( m_panel1, wxID_ANY, wxT("Enter..."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonEnterVidNum->SetToolTip( wxT("Enter video number") );
+	m_buttonEnterVidNum = new wxButton( m_panel1, wxID_ANY, wxT("Enter #..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonEnterVidNum->SetToolTip( wxT("Enter media number") );
 
 	bSizer3->Add( m_buttonEnterVidNum, 0, wxALL, 5 );
 
-	m_buttonLouder = new wxButton( m_panel1, wxID_ANY, wxT("^^^"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonLouder = new wxButton( m_panel1, wxID_ANY, wxT("Louder"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_buttonLouder->SetToolTip( wxT("Louder") );
 
 	bSizer3->Add( m_buttonLouder, 0, wxALL, 5 );
 
-	m_buttonSofter = new wxButton( m_panel1, wxID_ANY, wxT("vvv"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonSofter = new wxButton( m_panel1, wxID_ANY, wxT("Softer"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_buttonSofter->SetToolTip( wxT("Softer") );
 
 	bSizer3->Add( m_buttonSofter, 0, wxALL, 5 );
@@ -125,6 +119,14 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_menuItemFileSaveAs = new wxMenuItem( m_menuFile, wxID_ANY, wxString( wxT("Save As Video txt...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemFileSaveAs );
 
+	wxMenuItem* m_menuItemQuit;
+	m_menuItemQuit = new wxMenuItem( m_menuFile, wxID_ANY, wxString( wxT("Quit without save...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuFile->Append( m_menuItemQuit );
+
+	wxMenuItem* m_menuItemeExit;
+	m_menuItemeExit = new wxMenuItem( m_menuFile, wxID_ANY, wxString( wxT("Exit and save") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuFile->Append( m_menuItemeExit );
+
 	m_menubarMainFrame->Append( m_menuFile, wxT("File") );
 
 	m_menuHelp = new wxMenu();
@@ -140,12 +142,12 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	this->Centre( wxBOTH );
 
 	// Connect Events
-	m_buttonPrev10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPrev10 ), NULL, this );
+	m_buttonPrevfile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPrevFile ), NULL, this );
 	m_buttonPrev->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPrev ), NULL, this );
 	m_buttonPlay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPlay ), NULL, this );
-	m_buttonStop->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnStop ), NULL, this );
+	m_buttonPause->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPause ), NULL, this );
 	m_buttonNext->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnNext ), NULL, this );
-	m_buttonNext10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnNext10 ), NULL, this );
+	m_buttonNextFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnNextFile ), NULL, this );
 	m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnEnterVidNum ), NULL, this );
 	m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnLouder ), NULL, this );
 	m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );
@@ -154,18 +156,20 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileOpen ), this, m_menuItemFileOpen->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onFileSave ), this, m_menuItemFileSave->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onFileSaveAs ), this, m_menuItemFileSaveAs->GetId());
+	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileQuit ), this, m_menuItemQuit->GetId());
+	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileExit ), this, m_menuItemeExit->GetId());
 	m_menuHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onHelpAbout ), this, m_menuItemHelpAbout->GetId());
 }
 
 MainFrame::~MainFrame()
 {
 	// Disconnect Events
-	m_buttonPrev10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPrev10 ), NULL, this );
+	m_buttonPrevfile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPrevFile ), NULL, this );
 	m_buttonPrev->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPrev ), NULL, this );
 	m_buttonPlay->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPlay ), NULL, this );
-	m_buttonStop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnStop ), NULL, this );
+	m_buttonPause->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnPause ), NULL, this );
 	m_buttonNext->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnNext ), NULL, this );
-	m_buttonNext10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnNext10 ), NULL, this );
+	m_buttonNextFile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnNextFile ), NULL, this );
 	m_buttonEnterVidNum->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnEnterVidNum ), NULL, this );
 	m_buttonLouder->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnLouder ), NULL, this );
 	m_buttonSofter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );

@@ -43,18 +43,13 @@ class MainFrame ( wx.Frame ):
 
 		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 
-		m_radioBox1Choices = [ u"Pix", u"Movies" ]
-		self.m_radioBox1 = wx.RadioBox( self.m_panel1, wx.ID_ANY, u"wxRadioBox", wx.DefaultPosition, wx.DefaultSize, m_radioBox1Choices, 2, wx.RA_SPECIFY_COLS )
-		self.m_radioBox1.SetSelection( 0 )
-		bSizer3.Add( self.m_radioBox1, 0, wx.ALL, 5 )
+		self.m_buttonPrevfile = wx.Button( self.m_panel1, wx.ID_ANY, u"|<textfile", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_buttonPrevfile.SetToolTip( u"Previous in text file" )
 
-		self.m_buttonPrev10 = wx.Button( self.m_panel1, wx.ID_ANY, u"|<<<", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_buttonPrev10.SetToolTip( u"10 Previous" )
-
-		bSizer3.Add( self.m_buttonPrev10, 0, wx.ALL, 5 )
+		bSizer3.Add( self.m_buttonPrevfile, 0, wx.ALL, 5 )
 
 		self.m_buttonPrev = wx.Button( self.m_panel1, wx.ID_ANY, u"|<", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_buttonPrev.SetToolTip( u"Previous" )
+		self.m_buttonPrev.SetToolTip( u"Previous media file" )
 
 		bSizer3.Add( self.m_buttonPrev, 0, wx.ALL, 5 )
 
@@ -63,32 +58,32 @@ class MainFrame ( wx.Frame ):
 
 		bSizer3.Add( self.m_buttonPlay, 0, wx.ALL, 5 )
 
-		self.m_buttonStop = wx.Button( self.m_panel1, wx.ID_ANY, u">][<", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_buttonStop.SetToolTip( u"Stop" )
+		self.m_buttonPause = wx.Button( self.m_panel1, wx.ID_ANY, u">][<", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_buttonPause.SetToolTip( u"Pause" )
 
-		bSizer3.Add( self.m_buttonStop, 0, wx.ALL, 5 )
+		bSizer3.Add( self.m_buttonPause, 0, wx.ALL, 5 )
 
 		self.m_buttonNext = wx.Button( self.m_panel1, wx.ID_ANY, u">|", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_buttonNext.SetToolTip( u"Next" )
+		self.m_buttonNext.SetToolTip( u"Next media file" )
 
 		bSizer3.Add( self.m_buttonNext, 0, wx.ALL, 5 )
 
-		self.m_buttonNext10 = wx.Button( self.m_panel1, wx.ID_ANY, u">>>|", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_buttonNext10.SetToolTip( u"10 Next" )
+		self.m_buttonNextFile = wx.Button( self.m_panel1, wx.ID_ANY, u"textfile>|", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_buttonNextFile.SetToolTip( u"Next in text file" )
 
-		bSizer3.Add( self.m_buttonNext10, 0, wx.ALL, 5 )
+		bSizer3.Add( self.m_buttonNextFile, 0, wx.ALL, 5 )
 
-		self.m_buttonEnterVidNum = wx.Button( self.m_panel1, wx.ID_ANY, u"Enter...", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_buttonEnterVidNum.SetToolTip( u"Enter video number" )
+		self.m_buttonEnterVidNum = wx.Button( self.m_panel1, wx.ID_ANY, u"Enter #...", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_buttonEnterVidNum.SetToolTip( u"Enter media number" )
 
 		bSizer3.Add( self.m_buttonEnterVidNum, 0, wx.ALL, 5 )
 
-		self.m_buttonLouder = wx.Button( self.m_panel1, wx.ID_ANY, u"^^^", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_buttonLouder = wx.Button( self.m_panel1, wx.ID_ANY, u"Louder", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_buttonLouder.SetToolTip( u"Louder" )
 
 		bSizer3.Add( self.m_buttonLouder, 0, wx.ALL, 5 )
 
-		self.m_buttonSofter = wx.Button( self.m_panel1, wx.ID_ANY, u"vvv", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_buttonSofter = wx.Button( self.m_panel1, wx.ID_ANY, u"Softer", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_buttonSofter.SetToolTip( u"Softer" )
 
 		bSizer3.Add( self.m_buttonSofter, 0, wx.ALL, 5 )
@@ -128,6 +123,12 @@ class MainFrame ( wx.Frame ):
 		self.m_menuItemFileSaveAs = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Save As Video txt...", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menuFile.Append( self.m_menuItemFileSaveAs )
 
+		self.m_menuItemQuit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Quit without save...", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuFile.Append( self.m_menuItemQuit )
+
+		self.m_menuItemeExit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Exit and save", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuFile.Append( self.m_menuItemeExit )
+
 		self.m_menubarMainFrame.Append( self.m_menuFile, u"File" )
 
 		self.m_menuHelp = wx.Menu()
@@ -142,12 +143,12 @@ class MainFrame ( wx.Frame ):
 		self.Centre( wx.BOTH )
 
 		# Connect Events
-		self.m_buttonPrev10.Bind( wx.EVT_BUTTON, self.onBtnPrev10 )
+		self.m_buttonPrevfile.Bind( wx.EVT_BUTTON, self.onBtnPrevFile )
 		self.m_buttonPrev.Bind( wx.EVT_BUTTON, self.onBtnPrev )
 		self.m_buttonPlay.Bind( wx.EVT_BUTTON, self.onBtnPlay )
-		self.m_buttonStop.Bind( wx.EVT_BUTTON, self.onBtnStop )
+		self.m_buttonPause.Bind( wx.EVT_BUTTON, self.onBtnPause )
 		self.m_buttonNext.Bind( wx.EVT_BUTTON, self.onBtnNext )
-		self.m_buttonNext10.Bind( wx.EVT_BUTTON, self.onBtnNext10 )
+		self.m_buttonNextFile.Bind( wx.EVT_BUTTON, self.onBtnNextFile )
 		self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
 		self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
 		self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
@@ -156,6 +157,8 @@ class MainFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSaveAs, id = self.m_menuItemFileSaveAs.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnFileQuit, id = self.m_menuItemQuit.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemeExit.GetId() )
 		self.Bind( wx.EVT_MENU, self.onHelpAbout, id = self.m_menuItemHelpAbout.GetId() )
 
 	def __del__( self ):
@@ -163,7 +166,7 @@ class MainFrame ( wx.Frame ):
 
 
 	# Virtual event handlers, overide them in your derived class
-	def onBtnPrev10( self, event ):
+	def onBtnPrevFile( self, event ):
 		event.Skip()
 
 	def onBtnPrev( self, event ):
@@ -172,13 +175,13 @@ class MainFrame ( wx.Frame ):
 	def onBtnPlay( self, event ):
 		event.Skip()
 
-	def onBtnStop( self, event ):
+	def onBtnPause( self, event ):
 		event.Skip()
 
 	def onBtnNext( self, event ):
 		event.Skip()
 
-	def onBtnNext10( self, event ):
+	def onBtnNextFile( self, event ):
 		event.Skip()
 
 	def onBtnEnterVidNum( self, event ):
@@ -203,6 +206,12 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def onFileSaveAs( self, event ):
+		event.Skip()
+
+	def OnFileQuit( self, event ):
+		event.Skip()
+
+	def OnFileExit( self, event ):
 		event.Skip()
 
 	def onHelpAbout( self, event ):

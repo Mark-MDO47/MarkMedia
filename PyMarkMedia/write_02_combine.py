@@ -30,17 +30,17 @@ if "capture" == status:
 
 """
 events = [
-           ["def OnFileOpen(", "\t\tdlg = wx.FileDialog(self, message=\"Choose a media file\", defaultDir=os.getcwd(), defaultFile=\"\", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)\n\n\t\tif dlg.ShowModal() == wx.ID_OK:\n\t\t\tpath = dlg.GetPath()\n\t\t\tself.DoLoadFile(path)\n\n\tdef DoLoadFile(self, path):\n\t\t# self.m_buttonPlay.Disable() ### FIXME\n\t\tif not self.m_mediactrl.Load(path):\n\t\t\twx.MessageBox(\"Unable to load %s: Unsupported format?\" % path, \"ERROR\", wx.ICON_ERROR | wx.OK)\n\t\telse:\n\t\t\tself.m_mediactrl.SetInitialSize()\n\t\t\tself.GetSizer().Layout()\n"],
-           ["def onBtnPlay(",  "\t\tif not self.m_mediactrl.Play():\n\t\t\twx.MessageBox(\"Unable to Play media : Unsupported format?\",\n\t\t\t\t\"ERROR\", wx.ICON_ERROR | wx.OK)\n\t\telse:\n\t\t\tself.m_mediactrl.SetInitialSize()\n\t\t\tself.GetSizer().Layout()\n"],
-           ["def onBtnStop(", "\t\tself.m_mediactrl.Stop()\n"],
-           ["def onBtnEnterVidNum(", "\t\tDlgEnterVidNum(self).ShowModal()\n"]
+           ["def OnFileOpen(", "        dlg = wx.FileDialog(self, message=\"Choose a media file\", defaultDir=os.getcwd(), defaultFile=\"\", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)\n\n        if dlg.ShowModal() == wx.ID_OK:\n            path = dlg.GetPath()\n            self.DoLoadFile(path)\n\n    def DoLoadFile(self, path):\n        # self.m_buttonPlay.Disable() ### FIXME\n        if not self.m_mediactrl.Load(path):\n            wx.MessageBox(\"Unable to load %s: Unsupported format?\" % path, \"ERROR\", wx.ICON_ERROR | wx.OK)\n        else:\n            self.m_mediactrl.SetInitialSize()\n            self.GetSizer().Layout()\n"],
+           ["def onBtnPlay(",  "        if not self.m_mediactrl.Play():\n            wx.MessageBox(\"Unable to Play media : Unsupported format?\",\n                \"ERROR\", wx.ICON_ERROR | wx.OK)\n        else:\n            self.m_mediactrl.SetInitialSize()\n            self.GetSizer().Layout()\n"],
+           ["def onBtnStop(", "        self.m_mediactrl.Stop()\n"],
+           ["def onBtnEnterVidNum(", "        DlgEnterVidNum(self).ShowModal()\n"]
 ]
 """
 
 # cmds are checked one at a time, waiting until each is done in order before moving to the next
 cmds =  [
             ["afteraddtext",  "import wx.xrc", "import wx.media\n", "unused"],
-            ["afteraddtext", "bSizerPanel.Add( self.m_staticTextStatus,", "\t\tself.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))\n\t\tbSizerPanel.Add( self.m_mediactrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )\n\n", "unused"] # add m_mediactrl in place of placeholder m_notebookMediaCtrl
+            ["afteraddtext", "bSizerPanel.Add( self.m_staticTextStatus,", "        self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))\n        bSizerPanel.Add( self.m_mediactrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )\n\n", "unused"] # add m_mediactrl in place of placeholder m_notebookMediaCtrl
         ]
 
 data = {"events": events, "cmds": cmds, "inpFile": inpFile, "otpFile": otpFile}

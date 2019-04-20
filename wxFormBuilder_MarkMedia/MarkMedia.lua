@@ -36,18 +36,13 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.bSizer3 = wx.wxBoxSizer( wx.wxHORIZONTAL )
 
-	UI.m_radioBox1Choices = { "Pix", "Movies" }
-	UI.m_radioBox1 = wx.wxRadioBox( UI.m_panel1, wx.wxID_ANY, "wxRadioBox", wx.wxDefaultPosition, wx.wxDefaultSize, UI.m_radioBox1Choices, 2, wx.wxRA_SPECIFY_COLS )
-	UI.m_radioBox1:SetSelection( 0 )
-	UI.bSizer3:Add( UI.m_radioBox1, 0, wx.wxALL, 5 )
+	UI.m_buttonPrevfile = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "|<textfile", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+	UI.m_buttonPrevfile:SetToolTip( "Previous in text file" )
 
-	UI.m_buttonPrev10 = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "|<<<", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_buttonPrev10:SetToolTip( "10 Previous" )
-
-	UI.bSizer3:Add( UI.m_buttonPrev10, 0, wx.wxALL, 5 )
+	UI.bSizer3:Add( UI.m_buttonPrevfile, 0, wx.wxALL, 5 )
 
 	UI.m_buttonPrev = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "|<", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_buttonPrev:SetToolTip( "Previous" )
+	UI.m_buttonPrev:SetToolTip( "Previous media file" )
 
 	UI.bSizer3:Add( UI.m_buttonPrev, 0, wx.wxALL, 5 )
 
@@ -56,32 +51,32 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.bSizer3:Add( UI.m_buttonPlay, 0, wx.wxALL, 5 )
 
-	UI.m_buttonStop = wx.wxButton( UI.m_panel1, wx.wxID_ANY, ">][<", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_buttonStop:SetToolTip( "Stop" )
+	UI.m_buttonPause = wx.wxButton( UI.m_panel1, wx.wxID_ANY, ">][<", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+	UI.m_buttonPause:SetToolTip( "Pause" )
 
-	UI.bSizer3:Add( UI.m_buttonStop, 0, wx.wxALL, 5 )
+	UI.bSizer3:Add( UI.m_buttonPause, 0, wx.wxALL, 5 )
 
 	UI.m_buttonNext = wx.wxButton( UI.m_panel1, wx.wxID_ANY, ">|", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_buttonNext:SetToolTip( "Next" )
+	UI.m_buttonNext:SetToolTip( "Next media file" )
 
 	UI.bSizer3:Add( UI.m_buttonNext, 0, wx.wxALL, 5 )
 
-	UI.m_buttonNext10 = wx.wxButton( UI.m_panel1, wx.wxID_ANY, ">>>|", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_buttonNext10:SetToolTip( "10 Next" )
+	UI.m_buttonNextFile = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "textfile>|", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+	UI.m_buttonNextFile:SetToolTip( "Next in text file" )
 
-	UI.bSizer3:Add( UI.m_buttonNext10, 0, wx.wxALL, 5 )
+	UI.bSizer3:Add( UI.m_buttonNextFile, 0, wx.wxALL, 5 )
 
-	UI.m_buttonEnterVidNum = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "Enter...", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_buttonEnterVidNum:SetToolTip( "Enter video number" )
+	UI.m_buttonEnterVidNum = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "Enter #...", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+	UI.m_buttonEnterVidNum:SetToolTip( "Enter media number" )
 
 	UI.bSizer3:Add( UI.m_buttonEnterVidNum, 0, wx.wxALL, 5 )
 
-	UI.m_buttonLouder = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "^^^", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+	UI.m_buttonLouder = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "Louder", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
 	UI.m_buttonLouder:SetToolTip( "Louder" )
 
 	UI.bSizer3:Add( UI.m_buttonLouder, 0, wx.wxALL, 5 )
 
-	UI.m_buttonSofter = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "vvv", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
+	UI.m_buttonSofter = wx.wxButton( UI.m_panel1, wx.wxID_ANY, "Softer", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
 	UI.m_buttonSofter:SetToolTip( "Softer" )
 
 	UI.bSizer3:Add( UI.m_buttonSofter, 0, wx.wxALL, 5 )
@@ -121,6 +116,12 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 	UI.m_menuItemFileSaveAs = wx.wxMenuItem( UI.m_menuFile, wx.wxID_ANY, "Save As Video txt...", "", wx.wxITEM_NORMAL )
 	UI.m_menuFile:Append( UI.m_menuItemFileSaveAs )
 
+	UI.m_menuItemQuit = wx.wxMenuItem( UI.m_menuFile, wx.wxID_ANY, "Quit without save...", "", wx.wxITEM_NORMAL )
+	UI.m_menuFile:Append( UI.m_menuItemQuit )
+
+	UI.m_menuItemeExit = wx.wxMenuItem( UI.m_menuFile, wx.wxID_ANY, "Exit and save", "", wx.wxITEM_NORMAL )
+	UI.m_menuFile:Append( UI.m_menuItemeExit )
+
 	UI.m_menubarMainFrame:Append( UI.m_menuFile, "File" )
 
 	UI.m_menuHelp = wx.wxMenu()
@@ -136,8 +137,8 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	-- Connect Events
 
-	UI.m_buttonPrev10:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-	--implements onBtnPrev10
+	UI.m_buttonPrevfile:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+	--implements onBtnPrevFile
 
 	event:Skip()
 	end )
@@ -154,8 +155,8 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 	event:Skip()
 	end )
 
-	UI.m_buttonStop:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-	--implements onBtnStop
+	UI.m_buttonPause:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+	--implements onBtnPause
 
 	event:Skip()
 	end )
@@ -166,8 +167,8 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 	event:Skip()
 	end )
 
-	UI.m_buttonNext10:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-	--implements onBtnNext10
+	UI.m_buttonNextFile:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+	--implements onBtnNextFile
 
 	event:Skip()
 	end )
@@ -216,6 +217,18 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.MainFrame:Connect( wx.wxID_ANY ,wx.wxEVT_COMMAND_MENU_SELECTED , function(event)
 	--implements onFileSaveAs
+
+	event:Skip()
+	end)
+
+	UI.MainFrame:Connect( wx.wxID_ANY ,wx.wxEVT_COMMAND_MENU_SELECTED , function(event)
+	--implements OnFileQuit
+
+	event:Skip()
+	end)
+
+	UI.MainFrame:Connect( wx.wxID_ANY ,wx.wxEVT_COMMAND_MENU_SELECTED , function(event)
+	--implements OnFileExit
 
 	event:Skip()
 	end)

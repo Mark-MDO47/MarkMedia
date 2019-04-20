@@ -37,24 +37,9 @@
 							<option>0</option>
 							<flag>wxALL</flag>
 							<border>5</border>
-							<object class="wxRadioBox" name="m_radioBox1">
-								<style>wxRA_SPECIFY_COLS</style>
-								<label>wxRadioBox</label>
-								<selection>0</selection>
-								<content>
-									<item>Pix</item>
-									<item>Movies</item>
-								</content>
-								<dimension>2</dimension>
-							</object>
-						</object>
-						<object class="sizeritem">
-							<option>0</option>
-							<flag>wxALL</flag>
-							<border>5</border>
-							<object class="wxButton" name="m_buttonPrev10">
-								<tooltip>10 Previous</tooltip>
-								<label>|&lt;&lt;&lt;</label>
+							<object class="wxButton" name="m_buttonPrevfile">
+								<tooltip>Previous in text file</tooltip>
+								<label>|&lt;textfile</label>
 								<default>0</default>
 								<markup>0</markup>
 								<bitmap />
@@ -65,7 +50,7 @@
 							<flag>wxALL</flag>
 							<border>5</border>
 							<object class="wxButton" name="m_buttonPrev">
-								<tooltip>Previous</tooltip>
+								<tooltip>Previous media file</tooltip>
 								<label>|&lt;</label>
 								<default>0</default>
 								<markup>0</markup>
@@ -88,8 +73,8 @@
 							<option>0</option>
 							<flag>wxALL</flag>
 							<border>5</border>
-							<object class="wxButton" name="m_buttonStop">
-								<tooltip>Stop</tooltip>
+							<object class="wxButton" name="m_buttonPause">
+								<tooltip>Pause</tooltip>
 								<label>&gt;][&lt;</label>
 								<default>0</default>
 								<markup>0</markup>
@@ -101,7 +86,7 @@
 							<flag>wxALL</flag>
 							<border>5</border>
 							<object class="wxButton" name="m_buttonNext">
-								<tooltip>Next</tooltip>
+								<tooltip>Next media file</tooltip>
 								<label>&gt;|</label>
 								<default>0</default>
 								<markup>0</markup>
@@ -112,9 +97,9 @@
 							<option>0</option>
 							<flag>wxALL</flag>
 							<border>5</border>
-							<object class="wxButton" name="m_buttonNext10">
-								<tooltip>10 Next</tooltip>
-								<label>&gt;&gt;&gt;|</label>
+							<object class="wxButton" name="m_buttonNextFile">
+								<tooltip>Next in text file</tooltip>
+								<label>textfile&gt;|</label>
 								<default>0</default>
 								<markup>0</markup>
 								<bitmap />
@@ -125,8 +110,8 @@
 							<flag>wxALL</flag>
 							<border>5</border>
 							<object class="wxButton" name="m_buttonEnterVidNum">
-								<tooltip>Enter video number</tooltip>
-								<label>Enter...</label>
+								<tooltip>Enter media number</tooltip>
+								<label>Enter #...</label>
 								<default>0</default>
 								<markup>0</markup>
 								<bitmap />
@@ -138,7 +123,7 @@
 							<border>5</border>
 							<object class="wxButton" name="m_buttonLouder">
 								<tooltip>Louder</tooltip>
-								<label>^^^</label>
+								<label>Louder</label>
 								<default>0</default>
 								<markup>0</markup>
 								<bitmap />
@@ -150,7 +135,7 @@
 							<border>5</border>
 							<object class="wxButton" name="m_buttonSofter">
 								<tooltip>Softer</tooltip>
-								<label>vvv</label>
+								<label>Softer</label>
 								<default>0</default>
 								<markup>0</markup>
 								<bitmap />
@@ -193,6 +178,14 @@
 				</object>
 				<object class="wxMenuItem" name="m_menuItemFileSaveAs">
 					<label>Save As Video txt...</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="m_menuItemQuit">
+					<label>Quit without save...</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="m_menuItemeExit">
+					<label>Exit and save</label>
 					<help></help>
 				</object>
 			</object>

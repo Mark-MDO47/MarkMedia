@@ -136,6 +136,10 @@ class MainFrame extends wxFrame {
 
 		$this->SetMenuBar( $this->m_menubarMainFrame );
 
+		$this->m_timerMedia = new wxTimer();
+		$this->m_timerMedia->SetOwner( $this, wxID_ANY );
+		$this->m_timerMedia->Start( 125 );
+
 
 		$this->Centre( wxBOTH );
 
@@ -157,6 +161,7 @@ class MainFrame extends wxFrame {
 		$this->Connect( $this->m_menuItemQuit->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileQuit") );
 		$this->Connect( $this->m_menuItemeExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileExit") );
 		$this->Connect( $this->m_menuItemHelpAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onHelpAbout") );
+		$this->Connect( wxID_ANY, wxEVT_TIMER, array($this, "onTimerMedia") );
 	}
 
 
@@ -230,6 +235,10 @@ class MainFrame extends wxFrame {
 	}
 
 	function onHelpAbout( $event ){
+		$event->Skip();
+	}
+
+	function onTimerMedia( $event ){
 		$event->Skip();
 	}
 

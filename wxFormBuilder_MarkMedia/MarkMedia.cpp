@@ -138,6 +138,9 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	this->SetMenuBar( m_menubarMainFrame );
 
+	m_timerMedia.SetOwner( this, wxID_ANY );
+	m_timerMedia.Start( 125 );
+
 
 	this->Centre( wxBOTH );
 
@@ -159,6 +162,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileQuit ), this, m_menuItemQuit->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileExit ), this, m_menuItemeExit->GetId());
 	m_menuHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onHelpAbout ), this, m_menuItemHelpAbout->GetId());
+	this->Connect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( MainFrame::onTimerMedia ) );
 }
 
 MainFrame::~MainFrame()
@@ -175,5 +179,6 @@ MainFrame::~MainFrame()
 	m_buttonSofter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );
 	m_listBoxVidComments->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::onLBoxVidComments ), NULL, this );
 	m_listBoxVidComments->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( MainFrame::onListBoxDClickVidComments ), NULL, this );
+	this->Disconnect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( MainFrame::onTimerMedia ) );
 
 }

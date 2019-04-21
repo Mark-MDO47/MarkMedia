@@ -132,6 +132,10 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.MainFrame:SetMenuBar( UI.m_menubarMainFrame )
 
+	UI.m_timerMedia = wx.wxTimer(UI.MainFrame, wx.wxID_ANY)
+
+	UI.m_timerMedia:Start( 125 )
+
 
 	UI.MainFrame:Centre( wx.wxBOTH )
 
@@ -238,6 +242,12 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	event:Skip()
 	end)
+
+	UI.m_timerMedia:Connect( wx.wxEVT_TIMER, function(event)
+	--implements onTimerMedia
+
+	event:Skip()
+	end )
 
 
 

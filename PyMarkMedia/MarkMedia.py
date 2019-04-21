@@ -82,6 +82,9 @@ class MainFrame ( wx.Frame ):
     def __init__( self, parent ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 1245,1193 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
+        self.m_mediaLength = None # the length of media file; appears to be in milliseconds
+        self.m_mediaLoad = False # True when media load done until timer processes it
+
         self.SetIcon(wx.Icon("MadScience_256.ico")) # Mark: set icon
 
 
@@ -102,6 +105,13 @@ class MainFrame ( wx.Frame ):
         bSizerPanel.Add( self.m_staticTextStatus, 0, wx.ALL|wx.EXPAND, 5 )
         self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))
         bSizerPanel.Add( self.m_mediactrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+
+        self.m_notebookMediaCtrl = wx.Notebook( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_notebookMediaCtrl.SetMinSize( wx.Size( 800,800 ) )
+
+
+        bSizerPanel.Add( self.m_notebookMediaCtrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -201,6 +211,10 @@ class MainFrame ( wx.Frame ):
 
         self.SetMenuBar( self.m_menubarMainFrame )
 
+        self.m_timerMedia = wx.Timer()
+        self.m_timerMedia.SetOwner( self, wx.ID_ANY )
+        self.m_timerMedia.Start( 125 )
+
 
         self.Centre( wx.BOTH )
 
@@ -222,8 +236,10 @@ class MainFrame ( wx.Frame ):
         self.Bind( wx.EVT_MENU, self.OnFileQuit, id = self.m_menuItemQuit.GetId() )
         self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemeExit.GetId() )
         self.Bind( wx.EVT_MENU, self.onHelpAbout, id = self.m_menuItemHelpAbout.GetId() )
+        self.Bind( wx.EVT_TIMER, self.onTimerMedia, id=wx.ID_ANY )
 
     def __del__( self ):
+        del self.m_mediactrl
         pass
 
 
@@ -293,17 +309,23 @@ class MainFrame ( wx.Frame ):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.DoLoadFile(path)
-            if self.m_mediactrl.Play():
-                self.m_mediactrl.SetInitialSize()
-                self.GetSizer().Layout()
-                sleep(10.0) # sleep seconds
-                self.m_mediactrl.Pause()
+            self.m_mediaLoad = True
+            self.m_mediaLength = self.m_mediactrl.SetInitialSize()
+            print("Open length %s" % self.m_mediaLength)
+            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
+            # how to get the video to show ???
+            # if self.m_mediactrl.Play():
+                # self.m_mediactrl.SetInitialSize()
+                # self.GetSizer().Layout()
+                # sleep(10.0) # sleep seconds
+                # self.m_mediactrl.Pause()
 
     def DoLoadFile(self, path): # keep copying - this is in addition to OnFileOpen
         # self.m_buttonPlay.Disable() ### FIXME
         if not self.m_mediactrl.Load(path):
             wx.MessageBox("Unable to load %s: Unsupported format?" % path, "ERROR", wx.ICON_ERROR | wx.OK)
         else:
+            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
 
@@ -332,6 +354,25 @@ class MainFrame ( wx.Frame ):
 
     def onHelpAbout( self, event ):
         event.Skip()            # need to write this one
+
+
+    def onTimerMedia( self, event ):
+        # the length is -1 if nothing is loaded
+        # after the load it is length None
+        # some time after loading it goes to 0
+        # some time after that it goes to number of millisecs (ex: 9637)
+        # then some time later it rounds off to the seconds (ex: 9000); I don't know why
+        # we want to keep the 9637 from the example above
+        tmp = self.m_mediactrl.Length()
+        if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
+            self.m_mediaLength = self.m_mediactrl.Length()
+            print("timer length %s" % self.m_mediaLength)
+            if self.m_mediactrl.Play():
+                print("timer: Play worked")
+                self.m_mediactrl.SetInitialSize()
+                self.GetSizer().Layout()
+                sleep(0.05) # sleep seconds
+                self.m_mediactrl.Pause()
 
 
 

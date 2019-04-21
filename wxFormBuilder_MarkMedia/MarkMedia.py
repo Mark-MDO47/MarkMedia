@@ -139,6 +139,10 @@ class MainFrame ( wx.Frame ):
 
 		self.SetMenuBar( self.m_menubarMainFrame )
 
+		self.m_timerMedia = wx.Timer()
+		self.m_timerMedia.SetOwner( self, wx.ID_ANY )
+		self.m_timerMedia.Start( 125 )
+
 
 		self.Centre( wx.BOTH )
 
@@ -160,6 +164,7 @@ class MainFrame ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.OnFileQuit, id = self.m_menuItemQuit.GetId() )
 		self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemeExit.GetId() )
 		self.Bind( wx.EVT_MENU, self.onHelpAbout, id = self.m_menuItemHelpAbout.GetId() )
+		self.Bind( wx.EVT_TIMER, self.onTimerMedia, id=wx.ID_ANY )
 
 	def __del__( self ):
 		pass
@@ -215,6 +220,9 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def onHelpAbout( self, event ):
+		event.Skip()
+
+	def onTimerMedia( self, event ):
 		event.Skip()
 
 

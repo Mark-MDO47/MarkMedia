@@ -53,6 +53,10 @@
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.DoLoadFile(path)
+            self.m_mediaLoad = True
+            self.m_mediaLength = self.m_mediactrl.SetInitialSize()
+            print("Open length %s" % self.m_mediaLength)
+            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
             # how to get the video to show ???
             # if self.m_mediactrl.Play():
                 # self.m_mediactrl.SetInitialSize()
@@ -65,6 +69,7 @@
         if not self.m_mediactrl.Load(path):
             wx.MessageBox("Unable to load %s: Unsupported format?" % path, "ERROR", wx.ICON_ERROR | wx.OK)
         else:
+            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
 
@@ -88,4 +93,22 @@
 
     def onHelpAbout( self, event ):
         event.Skip()            # need to write this one
+
+    def onTimerMedia( self, event ):
+        # the length is -1 if nothing is loaded
+        # after the load it is length None
+        # some time after loading it goes to 0
+        # some time after that it goes to number of millisecs (ex: 9637)
+        # then some time later it rounds off to the seconds (ex: 9000); I don't know why
+        # we want to keep the 9637 from the example above
+        tmp = self.m_mediactrl.Length()
+        if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
+            self.m_mediaLength = self.m_mediactrl.Length()
+            print("timer length %s" % self.m_mediaLength)
+            if self.m_mediactrl.Play():
+                print("timer: Play worked")
+                self.m_mediactrl.SetInitialSize()
+                self.GetSizer().Layout()
+                sleep(0.05) # sleep seconds
+                self.m_mediactrl.Pause()
 

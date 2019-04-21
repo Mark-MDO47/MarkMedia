@@ -25,6 +25,7 @@
 #include <wx/listbox.h>
 #include <wx/panel.h>
 #include <wx/menu.h>
+#include <wx/timer.h>
 #include <wx/frame.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -55,6 +56,7 @@ class MainFrame : public wxFrame
 		wxMenuBar* m_menubarMainFrame;
 		wxMenu* m_menuFile;
 		wxMenu* m_menuHelp;
+		wxTimer m_timerMedia;
 
 		// Virtual event handlers, overide them in your derived class
 		virtual void onBtnPrevFile( wxCommandEvent& event ) { event.Skip(); }
@@ -74,6 +76,7 @@ class MainFrame : public wxFrame
 		virtual void OnFileQuit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onHelpAbout( wxCommandEvent& event ) { event.Skip(); }
+		virtual void onTimerMedia( wxTimerEvent& event ) { event.Skip(); }
 
 
 	public:

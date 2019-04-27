@@ -67,6 +67,82 @@
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
 
+    def convertMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
+        # for historical reasons numbering is
+        # leftmost digit: _01...9A...Z
+        # next     digit: 01...9A...Z
+        # next 3  digits: 01...9
+        # (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
+        MarksWeirdDigits = [ "_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                    "0123456789",
+                    "0123456789",
+                    "0123456789"
+                 ]
+
+        good = True
+        converted = 0
+        if len(theNumberText) < len(MarksWeirdDigits):
+            good = False
+            converted = -1
+        if good:
+            for idx in range(len(MarksWeirdDigits)):
+                converted *= len(MarksWeirdDigits[idx])
+                tmp = MarksWeirdDigits[idx].find(theNumberText[idx])
+                if -1 != tmp:
+                    converted += tmp
+                else:
+                    good = False
+                    converted = -1
+                    break
+        return good, converted
+
+    def doFindNextTextFileUsableLine(self, theLines, idxLines): # keep copying - this is in addition to OnFileOpen
+        """finds next TxtFile Usable Line"""
+        foundit = -1
+        good = False
+        for idx in range(idxLines+1, len(theLines)):
+            good, theNum = self.convertMarksWeirdNumbers(theLines[idx])
+            if good != True:
+                continue
+            else:
+                foundit = idx
+                break
+        return foundit
+
+    def doLoadTextFile(self, fname): # keep copying - this is in addition to OnFileOpen
+        """Opens text file, makes a backup *.001.txt"""
+        self.m_txtFileIdx = -1
+        self.m_txtFileLines = []
+        retn = "OK"
+        absName = "UNKNOWN"
+        fp = None
+        try:
+            absName = os.path.abspath(fname)
+            fp = open(absName, 'rt')
+            while True:
+                line = fp.readline()
+                if len(line) <= 0:
+                    break
+                self.m_txtFileLines.append(line.strip())
+            fp.close()
+        except: # I know, too broad, but this is just for me
+            if fp:
+                fp.close()
+            self.m_txtFileLines = []
+        if len(self.m_txtFileLines) < 1:
+            self.m_txtFileLines = []
+            return "ERROR: cannot read %s" % fname
+        if ("#" != self.m_txtFileLines[-1][0]) or (-1 == self.m_txtFileLines[-1].find("END OF FILE")):
+            self.m_txtFileLines = []
+            retn = "ERROR: file %s last line is not # ... END OF FILE" % fname
+        self.m_txtFilePath = absName
+        self.m_txtFileIdx = self.doFindNextTextFileUsableLine(self.m_txtFileLines, self.m_txtFileIdx)
+        if self.m_txtFileIdx < 0:
+            self.m_txtFileLines = []
+            retn = "ERROR: file %s has no non-comment lines" % fname
+        return retn
+
 
     def onFileSave( self, event ):
         event.Skip()            # need to write this one

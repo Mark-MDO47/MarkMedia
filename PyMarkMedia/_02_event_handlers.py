@@ -53,16 +53,10 @@
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.DoLoadFile(path)
-            self.m_mediaLoad = True
-            self.m_mediaLength = self.m_mediactrl.SetInitialSize()
-            print("Open length %s" % self.m_mediaLength)
-            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
-            # how to get the video to show ???
-            # if self.m_mediactrl.Play():
-                # self.m_mediactrl.SetInitialSize()
-                # self.GetSizer().Layout()
-                # sleep(10.0) # sleep seconds
-                # self.m_mediactrl.Pause()
+            self.m_mediactrl.SetInitialSize()
+            self.m_mediaLength = None
+            #     print("Open length %s" % self.m_mediaLength)
+            # onTimerMedia() will cause the video to play and show an early frame
 
     def DoLoadFile(self, path): # keep copying - this is in addition to OnFileOpen
         # self.m_buttonPlay.Disable() ### FIXME
@@ -104,9 +98,9 @@
         tmp = self.m_mediactrl.Length()
         if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
             self.m_mediaLength = self.m_mediactrl.Length()
-            print("timer length %s" % self.m_mediaLength)
+            # print("timer length %s" % self.m_mediaLength)
             if self.m_mediactrl.Play():
-                print("timer: Play worked")
+                # print("timer: Play worked")
                 self.m_mediactrl.SetInitialSize()
                 self.GetSizer().Layout()
                 sleep(0.05) # sleep seconds

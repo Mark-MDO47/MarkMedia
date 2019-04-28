@@ -1,3 +1,26 @@
+#
+# Mark Olson
+#
+# combine_MarkMedia.py is used to insert my specific code into wxFormBuilder output.
+# combine.sh
+#    changes tabs to spaces so I don't have a crazy mixture
+#    runs all the write_*_combine.py to create the YAML files
+#    runs this file on each of the sorted YAML files
+#        YAML file has cmds, events, inputFile and outputFile
+#        cmds are done in order; events can happen in any order
+#
+# This file has the "event handlers" that get replaced in any order.
+# This is read by write_02_combine.html and turned into YAML.
+#
+# events will be processed in any order; make sure they are unique
+#    events find and copy the "find" text line then replace the next line with new line(s)
+#        copy lines go from the event file through write_xx_combine to YAML
+#        usually the copy lines stop when it finds the next "def " line
+#        if you need to keep copying more methods with an event, add "# keep copying"
+#            on each def line that you want copied in.
+#        You can put additional text after that for example "# keep copying - this is in addition to OnFileOpen"
+#
+
     # Virtual event handlers, overide them in your derived class
     def onBtnPrevFile( self, event ):
         event.Skip()            # need to write this one

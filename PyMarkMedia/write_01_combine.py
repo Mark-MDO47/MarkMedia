@@ -1,3 +1,14 @@
+#
+# Mark Olson
+#
+# combine_MarkMedia.py is used to insert my specific code into wxFormBuilder output.
+# combine.sh
+#    changes tabs to spaces so I don't have a crazy mixture
+#    runs all the write_*_combine.py to create the YAML files
+#    runs this file on each of the sorted YAML files
+#        YAML file has cmds, events, inputFile and outputFile
+#        cmds are done in order; events can happen in any order
+#
 import os
 import sys
 import yaml

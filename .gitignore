@@ -105,3 +105,8 @@ venv.bak/
 
 # mdo stuff
 getFromWorking.sh
+PyMarkMedia/01_combine.yaml
+PyMarkMedia/02_combine.yaml
+PyMarkMedia/_00_DialogEnterVidNum.py
+PyMarkMedia/_00_MarkMedia.py
+PyMarkMedia/_01_MarkMedia.py

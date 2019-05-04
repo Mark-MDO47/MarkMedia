@@ -26,7 +26,7 @@
 #    afterskipto... after seeing cmdaftr, skip input file until see cmdtext
 #    afteraddtext... after seeing cmdaftr, write cmdtext
 #    afterreplaceline... after seeing cmdaftr, skip next input line and write cmdtext - easier to do with events if unique
-#    aftercopyfilefrom... after seeing cmdaftr, open cmdfile then read till find cmdtext and copy that line and all the rest of cmdfile
+#    aftercopyfilefrom... after seeing cmdaftr, open cmdfile then read till find cmdtext in cmdfile and copy that line and all the rest of cmdfile
 #
 # if your commands have an atendaddtext it should be the last command in the list; it will add the text at the
 #    end of the output file
@@ -89,7 +89,7 @@ def doMain(inpFile="unknown", otpFile="unknown", events=[], cmds=[]):
     numline = 0
     while len(line) > 0:
 
-            # always read and write the next line before processing; that is why cmds and events are "after..."
+       # always read and write the next line before processing; that is why cmds and events are "after..."
        numline, line = getline(fobj_inp, numline)
        if len(line) <= 0:
            break
@@ -178,4 +178,16 @@ if __name__ == "__main__":
         print("ERROR: need exactly one param: YAML input file for %s" % sys.argv[0])
         exit(1)
     inpFile, otpFile, events, cmds = getMyParms(sys.argv[1])
+    for idx, cmd in enumerate(cmds):
+        print("DEBUG - cmds[%d]: [\"%s\", \"%s\", ...]" % (idx, cmd[0], cmd[1]))
+    for idx, evt in enumerate(events):
+        print("DEBUG - event[%d]: [\"%s\", ...]" % (idx, evt[0]))
+        """
+        print("DEBUG - event[%d]: [" % idx)
+        beforeText = ""
+        for element in evt:
+            print("%s\"%s\"" % (beforeText, element))
+            beforeText = ", "
+        print("]\n")
+        """
     doMain(inpFile=inpFile, otpFile=otpFile, events=events, cmds=cmds)

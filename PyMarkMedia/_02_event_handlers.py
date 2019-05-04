@@ -12,14 +12,6 @@
 # This file has the "event handlers" that get replaced in any order.
 # This is read by write_02_combine.html and turned into YAML.
 #
-# events will be processed in any order; make sure they are unique
-#    events find and copy the "find" text line then replace the next line with new line(s)
-#        copy lines go from the event file through write_xx_combine to YAML
-#        usually the copy lines stop when it finds the next "def " line
-#        if you need to keep copying more methods with an event, add "# keep copying"
-#            on each def line that you want copied in.
-#        You can put additional text after that for example "# keep copying - this is in addition to OnFileOpen"
-#
 
     # Virtual event handlers, overide them in your derived class
     def onBtnPrevFile( self, event ):
@@ -96,22 +88,16 @@
         # next     digit: 01...9A...Z
         # next 3  digits: 01...9
         # (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
-        MarksWeirdDigits = [ "_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                    "0123456789",
-                    "0123456789",
-                    "0123456789"
-                 ]
 
         good = True
         converted = 0
-        if len(theNumberText) < len(MarksWeirdDigits):
+        if len(theNumberText) < len(self.MarksWeirdDigits):
             good = False
             converted = -1
         if good:
-            for idx in range(len(MarksWeirdDigits)):
-                converted *= len(MarksWeirdDigits[idx])
-                tmp = MarksWeirdDigits[idx].find(theNumberText[idx])
+            for idx in range(len(self.MarksWeirdDigits)):
+                converted *= len(self.MarksWeirdDigits[idx])
+                tmp = self.MarksWeirdDigits[idx].find(theNumberText[idx])
                 if -1 != tmp:
                     converted += tmp
                 else:

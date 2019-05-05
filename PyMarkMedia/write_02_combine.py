@@ -17,6 +17,7 @@ inpFile  = "_01_MarkMedia.py"
 otpFile  = "MarkMedia.py"
 
 # events will be processed in any order; make sure they are unique
+# FIXME event gathering can get confused by comment lines containing def and # keep copying
 events = []
 eventFn = "_02_event_handlers.py"
 fobj_events = open(eventFn, 'rt')

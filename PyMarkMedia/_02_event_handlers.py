@@ -82,13 +82,17 @@
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
 
-    def convertMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
+    def fromMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
         # for historical reasons numbering is
         # leftmost digit: _01...9A...Z
         # next     digit: 01...9A...Z
         # next 3  digits: 01...9
         # (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
 
+        if type(theNumberText) != type('123'):
+            dlgRslt = wx.MessageBox("ERROR: cannot convert input type %s inside fromMarksWeirdNumbers()" % (type(theNumberText)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
+            good = False
+        theNumberText = theNumberText.upper()
         good = True
         converted = 0
         if len(theNumberText) < len(self.MarksWeirdDigits):
@@ -106,12 +110,35 @@
                     break
         return good, converted
 
+    def toMarksWeirdNumbers(self, theNumber): # keep copying - this is in addition to OnFileOpen
+        # see fromMarksWeirdNumbers() for description of strange numbering scheme
+        good = True
+        converted = "_0000" # zero
+        if type(theNumber) == type("123"): # if it is a string
+            theNumber = int(theNumber)
+        if type(theNumber) != type(123):
+            dlgRslt = wx.MessageBox("ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
+            good = False
+        else:
+            # FIXME let's cheat a little; we know some things about this...
+            last3 = "%3d" % (theNumber % 1000)
+            first2int = int(theNumber // 1000)
+            firstint = int(first2int // len(self.MarksWeirdDigits[1]))
+            secondint = first2int - firstint*len(self.MarksWeirdDigits[1])
+            if firstint > len(self.MarksWeirdDigits[0]):
+                theMax = ((len(self.MarksWeirdDigits[0])-1) * len(self.MarksWeirdDigits[1]) + (len(self.MarksWeirdDigits[1])-1))*1000 + 999
+                dlgRslt = wx.MessageBox("ERROR: cannot convert %d: larger than max %d inside toMarksWeirdNumbers()" % (theNumber, theMax), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
+                good = False
+            else:
+                converted = self.MarksWeirdDigits[0][firstint] + self.MarksWeirdDigits[1][secondint] + last3
+        return good, converted
+
     def doFindNextTextFileUsableLine(self, theLines, idxLines): # keep copying - this is in addition to OnFileOpen
         """finds next TxtFile Usable Line"""
         foundit = -1
         good = False
         for idx in range(idxLines+1, len(theLines)):
-            good, theNum = self.convertMarksWeirdNumbers(theLines[idx])
+            good, theNum = self.fromMarksWeirdNumbers(theLines[idx])
             if good != True:
                 continue
             else:

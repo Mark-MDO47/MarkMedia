@@ -24,6 +24,7 @@
 # here are the commands:
 #    atend... finish copying the input file then add the cmdtext - only atendaddtext at this time
 #    afterskipto... after seeing cmdaftr, skip input file until see cmdtext
+#    afterskippastcopyentirefilefrom... after seeing cmdaftr, skip input file until PAST cmdtext then copy ENTIRE file in cmdfile
 #    afteraddtext... after seeing cmdaftr, write cmdtext
 #    afterreplaceline... after seeing cmdaftr, skip next input line and write cmdtext - easier to do with events if unique
 #    aftercopyfilefrom... after seeing cmdaftr, open cmdfile then read till find cmdtext in cmdfile and copy that line and all the rest of cmdfile
@@ -41,6 +42,7 @@
 #    afteraddtext
 #    aftercopyfilefrom
 #    afterskipto
+#    afterskippastcopyentirefilefrom
 #    atendaddtext
 #
 
@@ -107,11 +109,27 @@ def doMain(inpFile="unknown", otpFile="unknown", events=[], cmds=[]):
        if cmdidx >= len(cmds):
            continue
        theCmd = cmds[cmdidx][cmdcmd]
-            # atend... finish copying the input file then add the cmdtext - only atendaddtext at this time
+       # atend... finish copying the input file then add the cmdtext - only atendaddtext at this time
        if theCmd.find("atend") != -1:
            sys.stdout.write("DEBUG atend line %d: %s" % (numline, line))
            continue # just copy the rest of the lines
-            # afterskipto... after seeing cmdaftr, skip input file until see cmdtext
+       # afterskippastcopyentirefilefrom... after seeing cmdaftr, skip input file until AFTER see cmdtext then copy ENTIRE cmdfile
+       elif (theCmd.find("afterskippastcopyentirefilefrom") != -1) and (line.find(cmds[cmdidx][cmdaftr]) != -1):
+           thetext = cmds[cmdidx][cmdtext]
+           sys.stdout.write("DEBUG found line %d: %s    skipping PAST %s then copying ENTIRE file %s\n" % (numline, line, thetext, cmds[cmdidx][cmdfile]))
+           line = " "
+           while (len(line) > 0) and (line.find(thetext) == -1):
+               sys.stdout.write("DEBUG skipping line %d: %s" % (numline, line))
+               numline, line = getline(fobj_inp, numline) # keep skipping
+               print("  DEBUG nxt line %s" % line)
+           if line.find(thetext) != -1:
+               sys.stdout.write("DEBUG done skipping found line %d: %s, copying in file %s" % (numline, line, cmds[cmdidx][cmdfile]))
+               fobj_copy = open(cmds[cmdidx][cmdfile], "rt")
+               for cpyline in fobj_copy:
+                   fobj_otp.write(cpyline)
+               fobj_copy.close()
+               cmdidx += 1
+       # afteraddtext... after seeing cmdaftr, write cmdtext
        elif (theCmd.find("afterskipto") != -1) and (line.find(cmds[cmdidx][cmdaftr]) != -1):
            thetext = cmds[cmdidx][cmdtext]
            sys.stdout.write("DEBUG found line %d: %s    skipping till %s\n" % (numline, line, thetext))
@@ -122,12 +140,12 @@ def doMain(inpFile="unknown", otpFile="unknown", events=[], cmds=[]):
            sys.stdout.write("DEBUG done skipping found line %d: %s" % (numline, line))
            fobj_otp.write(line)
            cmdidx += 1
-            # afteraddtext... after seeing cmdaftr, write cmdtext
+       # afteraddtext... after seeing cmdaftr, write cmdtext
        elif (theCmd.find("afteraddtext") != -1) and (line.find(cmds[cmdidx][cmdaftr]) != -1):
            sys.stdout.write("DEBUG afteraddtext line %d: %s" % (numline, line))
            fobj_otp.write(cmds[cmdidx][cmdtext])
            cmdidx += 1
-            # afterreplaceline... after seeing cmdaftr, skip next input line and write cmdtext - easier to do with events if unique
+       # afterreplaceline... after seeing cmdaftr, skip next input line and write cmdtext - easier to do with events if unique
        elif (theCmd.find("afterreplaceline") != -1) and (line.find(cmds[cmdidx][cmdaftr]) != -1):
            sys.stdout.write("DEBUG afterreplaceline line %d: %s" % (numline, line))
            numrepl = 1 # have not found a need for multiple line replace yet
@@ -137,7 +155,7 @@ def doMain(inpFile="unknown", otpFile="unknown", events=[], cmds=[]):
                numrepl -= 1
            fobj_otp.write(cmds[cmdidx][cmdtext])
            cmdidx += 1
-            # aftercopyfilefrom... after seeing cmdaftr, open cmdfile then read till find cmdtext and copy that line and all the rest of cmdfile
+       # aftercopyfilefrom... after seeing cmdaftr, open cmdfile then read till find cmdtext and copy that line and all the rest of cmdfile
        elif (theCmd.find("aftercopyfilefrom") != -1) and (line.find(cmds[cmdidx][cmdaftr]) != -1):
            sys.stdout.write("DEBUG aftercopyfilefrom line %d: %s    read file %s\n" % (numline, line, cmds[cmdidx][cmdfile]))
            copyit = False
@@ -153,7 +171,7 @@ def doMain(inpFile="unknown", otpFile="unknown", events=[], cmds=[]):
     
     
     fobj_inp.close()
-        # final processing of atend...
+    # final processing of atend...
     while cmdidx < len(cmds):
        if cmds[cmdidx][cmdcmd].find("atendaddtext") != -1:
            fobj_otp.write(cmds[cmdidx][cmdtext])

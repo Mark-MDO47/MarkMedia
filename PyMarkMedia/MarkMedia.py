@@ -78,17 +78,18 @@ class DlgEnterVidNum ( wx.Dialog ):
 ###########################################################################
 
 class MainFrame ( wx.Frame ):
-
-    def __init__( self, parent ):
+    def __init__( self, parent, absRunPath = "" ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 1245,1193 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
         # inserted by aftercopyfilefrom to be copied after "wx.Frame.__init__"
+        self.m_absRunPath = absRunPath # absolute path we were run from
         self.m_txtFilePath = "UNKNOWN" # absolute path to open text file
         self.m_txtFileLines = []       # lines for open text file, stripped
         self.m_txtFileIdx = -1         # which line for open text file or -1
         self.m_mediaLength = None # the length of media file; appears to be in milliseconds
         self.m_mediaLoad = False  # True when media load done until timer processes it
         
-        self.SetIcon(wx.Icon("MadScience_256.ico")) # Mark: set icon
+        self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
         # for historical reasons numbering is
         #   leftmost digit: _01...9A...Z
@@ -101,8 +102,6 @@ class MainFrame ( wx.Frame ):
             "0123456789",
             "0123456789"
         ]
-
-        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         bSizerFrame = wx.BoxSizer( wx.VERTICAL )
 
@@ -452,5 +451,5 @@ class MainFrame ( wx.Frame ):
 ###########################################################################
 
 app = wx.App()
-frame = MainFrame(None).Show()
+frame = MainFrame(None, os.path.dirname(os.path.realpath(__file__))).Show()
 app.MainLoop()

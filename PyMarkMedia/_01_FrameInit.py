@@ -1,11 +1,13 @@
+
         # inserted by aftercopyfilefrom to be copied after "wx.Frame.__init__"
+        self.m_absRunPath = absRunPath # absolute path we were run from
         self.m_txtFilePath = "UNKNOWN" # absolute path to open text file
         self.m_txtFileLines = []       # lines for open text file, stripped
         self.m_txtFileIdx = -1         # which line for open text file or -1
         self.m_mediaLength = None # the length of media file; appears to be in milliseconds
         self.m_mediaLoad = False  # True when media load done until timer processes it
         
-        self.SetIcon(wx.Icon("MadScience_256.ico")) # Mark: set icon
+        self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
         # for historical reasons numbering is
         #   leftmost digit: _01...9A...Z

@@ -24,10 +24,11 @@ cmds = [
         ["afteraddtext", "coding: utf-8", "\nimport sys\nimport os\nfrom time import sleep\n", "unused"],
         ["afterskipto", "## http://www.wxformbuilder.org/", "#################################", "unused"],
         ["aftercopyfilefrom",  "import wx.xrc", "import gettext", "_00_DialogEnterVidNum.py"],
-        ["aftercopyfilefrom", "wx.Frame.__init__", "aftercopyfilefrom to be copied after", "_01_FrameInit.py"],
+        ["afterskippastcopyentirefilefrom", "class MainFrame ( ", "def __init__( self, parent )", "_01_FrameInit_def.py"],
+        ["afterskippastcopyentirefilefrom", "wx.Frame.__init__ (", "self.SetSizeHints(", "_01_FrameInit.py"],
         ["afterskipto", "bSizerPanel.Add( self.m_staticTextStatus,", "bSizer3 = wx.BoxSizer(", "unused"],   # remove placeholder m_notebookMediaCtrl to make room for m_mediactrl
         ["afteraddtext", "def __del__( self", "        del self.m_mediactrl\n", "unused"],
-        ["atendaddtext", "unused", "###########################################################################\n## MAIN PROGRAM\n###########################################################################\n\napp = wx.App()\nframe = MainFrame(None).Show()\napp.MainLoop()\n", "unused"]
+        ["atendaddtext", "unused", "###########################################################################\n## MAIN PROGRAM\n###########################################################################\n\napp = wx.App()\nframe = MainFrame(None, os.path.dirname(os.path.realpath(__file__))).Show()\napp.MainLoop()\n", "unused"]
 ]
 
 data = {"events": events, "cmds": cmds, "inpFile": inpFile, "otpFile": otpFile}

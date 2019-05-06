@@ -123,7 +123,7 @@ def doMain(inpFile="unknown", otpFile="unknown", events=[], cmds=[]):
                numline, line = getline(fobj_inp, numline) # keep skipping
                print("  DEBUG nxt line %s" % line)
            if line.find(thetext) != -1:
-               sys.stdout.write("DEBUG done skipping found line %d: %s, copying in file %s" % (numline, line, cmds[cmdidx][cmdfile]))
+               sys.stdout.write("DEBUG done skipping found line %d: %s, copying in file %s\n" % (numline, line, cmds[cmdidx][cmdfile]))
                fobj_copy = open(cmds[cmdidx][cmdfile], "rt")
                for cpyline in fobj_copy:
                    fobj_otp.write(cpyline)

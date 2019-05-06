@@ -133,11 +133,13 @@
                 converted = self.MarksWeirdDigits[0][firstint] + self.MarksWeirdDigits[1][secondint] + last3
         return good, converted
 
-    def doFindNextTextFileUsableLine(self, theLines, idxLines): # keep copying - this is in addition to OnFileOpen
-        """finds next TxtFile Usable Line"""
+    def doFindDirecTextFileUsableLine(self, direc): # keep copying - this is in addition to OnFileOpen
+        """finds m_txtFileLines Usable Line idx in direction direc or -1"""
         foundit = -1
         good = False
-        for idx in range(idxLines+1, len(theLines)):
+        idx = self.m_txtFileIdx
+        while (idx >= 0) and (idx < len(self.m_txtFileLines)):
+            idx += direc
             good, theNum = self.fromMarksWeirdNumbers(theLines[idx])
             if good != True:
                 continue
@@ -173,12 +175,11 @@
             self.m_txtFileLines = []
             retn = "ERROR: file %s last line is not # ... END OF FILE" % fname
         self.m_txtFilePath = absName
-        self.m_txtFileIdx = self.doFindNextTextFileUsableLine(self.m_txtFileLines, self.m_txtFileIdx)
+        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
         if self.m_txtFileIdx < 0:
             self.m_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname
         return retn
-
 
     def onFileSave( self, event ):
         event.Skip()            # need to write this one

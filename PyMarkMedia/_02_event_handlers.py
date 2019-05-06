@@ -138,9 +138,11 @@
         foundit = -1
         good = False
         idx = self.m_txtFileIdx
-        while (idx >= 0) and (idx < len(self.m_txtFileLines)):
+        while True:
             idx += direc
-            good, theNum = self.fromMarksWeirdNumbers(theLines[idx])
+            if (idx < 0) or (idx >= len(self.m_txtFileLines)):
+                break
+            good, ignore = self.fromMarksWeirdNumbers(self.m_txtFileLines[idx])
             if good != True:
                 continue
             else:
@@ -173,7 +175,7 @@
             return "ERROR: cannot read %s" % fname
         if ("#" != self.m_txtFileLines[-1][0]) or (-1 == self.m_txtFileLines[-1].find("END OF FILE")):
             self.m_txtFileLines = []
-            retn = "ERROR: file %s last line is not # ... END OF FILE" % fname
+            return "ERROR: file %s last line is not # ... END OF FILE" % fname
         self.m_txtFilePath = absName
         self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
         if self.m_txtFileIdx < 0:

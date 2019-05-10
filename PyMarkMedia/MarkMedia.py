@@ -310,24 +310,32 @@ class MainFrame ( wx.Frame ):
 
 
     def OnFileOpen( self, event ):
-        dlg = wx.FileDialog(self, message="Choose a media file", defaultDir=os.getcwd(), defaultFile="", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file", defaultDir=os.getcwd(), defaultFile="", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
 
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.DoLoadFile(path)
-            self.m_mediactrl.SetInitialSize()
-            self.m_mediaLength = None
-            #     print("Open length %s" % self.m_mediaLength)
-            # onTimerMedia() will cause the video to play and show an early frame
+            # self.m_mediactrl.SetInitialSize()
+            # self.m_mediaLength = None
 
-    def DoLoadFile(self, path): # keep copying - this is in addition to OnFileOpen
+    def DoLoadFile(self, pathTxt): # keep copying - this is in addition to OnFileOpen
         # self.m_buttonPlay.Disable() ### FIXME
-        if not self.m_mediactrl.Load(path):
-            wx.MessageBox("Unable to load %s: Unsupported format?" % path, "ERROR", wx.ICON_ERROR | wx.OK)
-        else:
-            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
-            self.m_mediactrl.SetInitialSize()
-            self.GetSizer().Layout()
+        loadOK = True
+        retn = self.doLoadTextFile(pathTxt)
+        if "OK" != retn:
+            wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+            loadOK = False
+        if loadOK:
+            mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5]
+            # FIXME Pix vs Movies
+            mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
+            if not self.m_mediactrl.Load(mediaFile):
+                wx.MessageBox("Unable to load media file %s: Unsupported format?" % mediaFile, "ERROR", wx.ICON_ERROR | wx.OK)
+            else:
+                # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
+                self.m_mediactrl.SetInitialSize()
+                self.GetSizer().Layout()
+        return loadOK
 
     def fromMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
         # for historical reasons numbering is
@@ -424,7 +432,9 @@ class MainFrame ( wx.Frame ):
             self.m_txtFileLines = []
             return "ERROR: file %s last line is not # ... END OF FILE" % fname
         self.m_txtFilePath = absName
-        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
+        self.rootDir = os.path.dirname(self.m_txtFilePath)
+        self.m_txtFileIdx = len(self.m_txtFileLines)-1
+        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+-1)
         if self.m_txtFileIdx < 0:
             self.m_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname

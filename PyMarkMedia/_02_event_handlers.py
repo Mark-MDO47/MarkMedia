@@ -78,16 +78,105 @@
         event.Skip()            # need to write this one
 
     def OnFileOpen( self, event ):
-        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file", defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        # FIXME Pix vs Movies
+        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file in complete Olson www folder", defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
             loadOK = True
-            pathTxt = dlg.GetPath()
-            retn = self.doLoadTextFile(pathTxt)
-            if "OK" != retn:
-                wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+            pathTxt = os.path.abspath(dlg.GetPath())
+            pathRootDir = os.path.dirname(pathTxt)
+            pathPictureInfo = os.path.join(pathRootDir, "OlsonPictureInfo.php")
+            if False == os.path.exists(pathPictureInfo):
+                wx.MessageBox("Unable to load required Info file %s: file does not exist" % pathPictureInfo, "ERROR", wx.ICON_ERROR | wx.OK)
                 loadOK = False
             if loadOK:
+                retn = self.doLoadInfoFile(pathPictureInfo)
+                if "OK" != retn:
+                    wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+                    loadOK = False
+            if loadOK:
+                retn = self.doLoadTextFile(pathTxt)
+                if "OK" != retn:
+                    wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+                    loadOK = False
+            if loadOK:
                 loadOK = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+
+    def doGetTxtFileLines(self, fname): # keep copying - this is in addition to OnFileOpen
+        """Opens text file and reads the lines"""
+        retn = "OK"
+        absName = "UNKNOWN"
+        fp = None
+        theLines = []
+        try:
+            absName = os.path.abspath(fname)
+            fp = open(absName, 'rt')
+            while True:
+                line = fp.readline()
+                if len(line) <= 0:
+                    break
+                theLines.append(line.strip())
+            fp.close()
+        except OSError as err:
+            try:
+                fp.close()
+            except:
+                pass
+            retn = "Error: %s" % err
+            theLines = []
+        except: # I know, too broad, but this is just for me
+            try:
+                fp.close()
+            except:
+                pass
+            retn = "Unexpected Error"
+            theLines = []
+        if ("OK" == retn) and (len(theLines) < 1):
+            retn = "ERROR: %s has no lines" % fname
+            theLines = []
+        return retn, theLines
+
+    def doLoadInfoFile(self, fname): # keep copying - this is in addition to OnFileOpen
+        """gets last filenum for MVI and IMG"""
+        # should contain lines that look like this:
+        # define("THE_MAX_IMGNUM","45065");
+        # define("THE_MAX_MVINUM","3441");
+        self.m_infoFile = {}
+        infoFile = {"THE_MAX_IMGNUM": -1, "THE_MAX_MVINUM": -1}
+        retn, infoLines = self.doGetTxtFileLines( fname )
+        if "OK" != retn:
+            return retn
+        for line in infoLines:
+            for key in infoFile.keys():
+                if -1 != line.find(key):
+                    lsplit = line.split('"')
+                    try:
+                        infoFile[key] = int(lsplit[-2])
+                    except:
+                        infoFile[key] = -1
+                        retn = "ERROR: file %s not in infoFile format" % fname
+        if ("OK" == retn) and (infoFile["THE_MAX_IMGNUM"] > 0) and (infoFile["THE_MAX_MVINUM"] > 0):
+            self.m_infoFile = infoFile
+            print(infoFile)
+        return retn
+
+    def doLoadTextFile(self, fname): # keep copying - this is in addition to OnFileOpen
+        """Opens text file"""
+        self.m_txtFileIdx = -1
+        retn, self.m_txtFileLines = self.doGetTxtFileLines( fname )
+        if "OK" != retn:
+            self.m_txtFileLines = []
+            return retn
+        if ("#" != self.m_txtFileLines[-1][0]) or (-1 == self.m_txtFileLines[-1].find("END OF FILE")):
+            self.m_txtFileLines = []
+            return "ERROR: file %s last line is not # ... END OF FILE" % fname
+        self.m_txtFilePath = os.path.abspath(fname)
+        self.rootDir = os.path.dirname(self.m_txtFilePath)
+        self.m_txtFileIdx = len(self.m_txtFileLines)-1
+        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
+        if self.m_txtFileIdx < 0:
+            self.m_txtFileLines = []
+            retn = "ERROR: file %s has no non-comment lines" % fname
+        return retn
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
@@ -186,41 +275,6 @@
                 foundit = idx
                 break
         return foundit
-
-    def doLoadTextFile(self, fname): # keep copying - this is in addition to OnFileOpen
-        """Opens text file, makes a backup *.001.txt"""
-        self.m_txtFileIdx = -1
-        self.m_txtFileLines = []
-        retn = "OK"
-        absName = "UNKNOWN"
-        fp = None
-        try:
-            absName = os.path.abspath(fname)
-            fp = open(absName, 'rt')
-            while True:
-                line = fp.readline()
-                if len(line) <= 0:
-                    break
-                self.m_txtFileLines.append(line.strip())
-            fp.close()
-        except: # I know, too broad, but this is just for me
-            if fp:
-                fp.close()
-            self.m_txtFileLines = []
-        if len(self.m_txtFileLines) < 1:
-            self.m_txtFileLines = []
-            return "ERROR: cannot read %s" % fname
-        if ("#" != self.m_txtFileLines[-1][0]) or (-1 == self.m_txtFileLines[-1].find("END OF FILE")):
-            self.m_txtFileLines = []
-            return "ERROR: file %s last line is not # ... END OF FILE" % fname
-        self.m_txtFilePath = absName
-        self.rootDir = os.path.dirname(self.m_txtFilePath)
-        self.m_txtFileIdx = len(self.m_txtFileLines)-1
-        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
-        if self.m_txtFileIdx < 0:
-            self.m_txtFileLines = []
-            retn = "ERROR: file %s has no non-comment lines" % fname
-        return retn
 
     def onFileSave( self, event ):
         event.Skip()            # need to write this one

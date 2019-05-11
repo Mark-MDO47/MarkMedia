@@ -15,7 +15,8 @@
 
     # Virtual event handlers, overide them in your derived class
     def onBtnPrevFile( self, event ):
-        event.Skip()            # need to write this one
+        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
+        ignore = self.doLoadupCurrMediaFile()
 
     def onBtnPrev( self, event ):
         event.Skip()            # need to write this one
@@ -38,7 +39,8 @@
 
 
     def onBtnNextFile( self, event ):
-        event.Skip()            # need to write this one
+        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
+        ignore = self.doLoadupCurrMediaFile()
 
     def onBtnEnterVidNum( self, event ):
         DlgEnterVidNum(self).ShowModal()
@@ -63,13 +65,29 @@
 
 
     def OnFileOpen( self, event ):
-        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file", defaultDir=os.getcwd(), defaultFile="", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-
+        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file", defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.DoLoadFile(path)
             # self.m_mediactrl.SetInitialSize()
             # self.m_mediaLength = None
+
+    def doLoadupCurrMediaFile( self ): # keep copying - this is in addition to OnFileOpen
+        loadOK = True
+        mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5]
+        # FIXME Pix vs Movies
+        self.m_mediaLength = None
+        mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
+        if not self.m_mediactrl.Load(mediaFile):
+            wx.MessageBox("Unable to load media file %s: Unsupported format?" % mediaFile, "ERROR", wx.ICON_ERROR | wx.OK)
+            loadOK = False
+        else:
+            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
+            self.m_mediactrl.SetInitialSize()
+            self.GetSizer().Layout()
+            self.m_staticTextStatus.SetLabel("Status: %s" % self.m_txtFileLines[self.m_txtFileIdx])
+        self.m_mediaLoadDisplay = loadOK
+        return loadOK
 
     def DoLoadFile(self, pathTxt): # keep copying - this is in addition to OnFileOpen
         # self.m_buttonPlay.Disable() ### FIXME
@@ -79,15 +97,7 @@
             wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
             loadOK = False
         if loadOK:
-            mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5]
-            # FIXME Pix vs Movies
-            mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
-            if not self.m_mediactrl.Load(mediaFile):
-                wx.MessageBox("Unable to load media file %s: Unsupported format?" % mediaFile, "ERROR", wx.ICON_ERROR | wx.OK)
-            else:
-                # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
-                self.m_mediactrl.SetInitialSize()
-                self.GetSizer().Layout()
+            loadOK = self.doLoadupCurrMediaFile()
         return loadOK
 
     def fromMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
@@ -187,7 +197,7 @@
         self.m_txtFilePath = absName
         self.rootDir = os.path.dirname(self.m_txtFilePath)
         self.m_txtFileIdx = len(self.m_txtFileLines)-1
-        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+-1)
+        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
         if self.m_txtFileIdx < 0:
             self.m_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname
@@ -220,14 +230,16 @@
         # some time after that it goes to number of millisecs (ex: 9637)
         # then some time later it rounds off to the seconds (ex: 9000); I don't know why
         # we want to keep the 9637 from the example above
-        tmp = self.m_mediactrl.Length()
-        if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
-            self.m_mediaLength = self.m_mediactrl.Length()
-            # print("timer length %s" % self.m_mediaLength)
-            if self.m_mediactrl.Play():
-                # print("timer: Play worked")
-                self.m_mediactrl.SetInitialSize()
-                self.GetSizer().Layout()
-                sleep(0.05) # sleep seconds
-                self.m_mediactrl.Pause()
+        if self.m_mediaLoadDisplay: # set True to load to a bit past the start
+            tmp = self.m_mediactrl.Length()
+            if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
+                self.m_mediaLength = self.m_mediactrl.Length()
+                # print("timer length %s" % self.m_mediaLength)
+                if self.m_mediactrl.Play():
+                    # print("timer: Play worked")
+                    self.m_mediactrl.SetInitialSize()
+                    self.GetSizer().Layout()
+                    sleep(0.05) # sleep seconds
+                    self.m_mediactrl.Pause()
+                    self.m_mediaLoadDisplay = False
 

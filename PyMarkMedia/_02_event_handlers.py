@@ -16,7 +16,7 @@
     # Virtual event handlers, overide them in your derived class
     def onBtnPrevFile( self, event ):
         self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
-        ignore = self.doLoadupCurrMediaFile()
+        ignore = self.doLoadupTxtCurrMediaFile()
 
     def onBtnPrev( self, event ):
         event.Skip()            # need to write this one
@@ -40,7 +40,7 @@
 
     def onBtnNextFile( self, event ):
         self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
-        ignore = self.doLoadupCurrMediaFile()
+        ignore = self.doLoadupTxtCurrMediaFile()
 
     def onBtnEnterVidNum( self, event ):
         DlgEnterVidNum(self).ShowModal()
@@ -72,22 +72,27 @@
             # self.m_mediactrl.SetInitialSize()
             # self.m_mediaLength = None
 
-    def doLoadupCurrMediaFile( self ): # keep copying - this is in addition to OnFileOpen
+    def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
-        mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5]
+        self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
         mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
         if not self.m_mediactrl.Load(mediaFile):
-            wx.MessageBox("Unable to load media file %s: Unsupported format?" % mediaFile, "ERROR", wx.ICON_ERROR | wx.OK)
+            txt = "Unable to load media file %s: Unsupported format?" % mediaFile
+            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
+            self.m_staticTextStatus.SetLabel("Status: %s" % txt)
             loadOK = False
         else:
             # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
-            self.m_staticTextStatus.SetLabel("Status: %s" % self.m_txtFileLines[self.m_txtFileIdx])
-        self.m_mediaLoadDisplay = loadOK
+            self.m_staticTextStatus.SetLabel("Status: %s" % statusText)
+        self.m_mediaStartStopDisplay = loadOK
         return loadOK
+
+    def doLoadupTxtCurrMediaFile( self ): # keep copying - this is in addition to OnFileOpen
+        return self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
 
     def DoLoadFile(self, pathTxt): # keep copying - this is in addition to OnFileOpen
         # self.m_buttonPlay.Disable() ### FIXME
@@ -97,7 +102,7 @@
             wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
             loadOK = False
         if loadOK:
-            loadOK = self.doLoadupCurrMediaFile()
+            loadOK = self.doLoadupTxtCurrMediaFile()
         return loadOK
 
     def fromMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
@@ -230,7 +235,7 @@
         # some time after that it goes to number of millisecs (ex: 9637)
         # then some time later it rounds off to the seconds (ex: 9000); I don't know why
         # we want to keep the 9637 from the example above
-        if self.m_mediaLoadDisplay: # set True to load to a bit past the start
+        if self.m_mediaStartStopDisplay: # set True to load to a bit past the start
             tmp = self.m_mediactrl.Length()
             if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
                 self.m_mediaLength = self.m_mediactrl.Length()
@@ -241,5 +246,5 @@
                     self.GetSizer().Layout()
                     sleep(0.05) # sleep seconds
                     self.m_mediactrl.Pause()
-                    self.m_mediaLoadDisplay = False
+                    self.m_mediaStartStopDisplay = False
 

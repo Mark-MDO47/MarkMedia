@@ -6,7 +6,7 @@
         self.m_txtFileIdx = -1         # which line for open text file or -1
         self.m_mediaLength = None # the length of media file; appears to be in milliseconds
         self.m_mediaLoad = False  # True when media load done until timer processes it
-        self.m_mediaLoadDisplay = False # yet another media load flag
+        self.m_mediaStartStopDisplay = False # yet another media load flag
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 

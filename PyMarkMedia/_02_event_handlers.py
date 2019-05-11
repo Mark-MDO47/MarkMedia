@@ -19,7 +19,14 @@
         ignore = self.doLoadupTxtCurrMediaFile()
 
     def onBtnPrev( self, event ):
-        event.Skip()            # need to write this one
+        ignore, mediaDecNum = self.fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
+        # print("fromMarksWeirdNumbers m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.m_mediaCurrentWeirdNum, ignore, mediaDecNum))
+        if mediaDecNum > 1:
+            mediaDecNum -= 1
+        # print("decrement m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.m_mediaCurrentWeirdNum, ignore, mediaDecNum))
+        ignore, weirdMediaNum = self.toMarksWeirdNumbers(mediaDecNum)
+        # print("toMarksWeirdNumbers weirdMediaNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (weirdMediaNum, ignore, mediaDecNum))
+        self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
 
 
     def onBtnPlay( self, event ):
@@ -35,7 +42,10 @@
         self.m_mediactrl.Pause()
 
     def onBtnNext( self, event ):
-        event.Skip()            # need to write this one
+        ignore, mediaDecNum = self.fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
+        mediaDecNum += 1
+        ignore, weirdMediaNum = self.toMarksWeirdNumbers(mediaDecNum)
+        self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
 
 
     def onBtnNextFile( self, event ):
@@ -88,6 +98,7 @@
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
             self.m_staticTextStatus.SetLabel("Status: %s" % statusText)
+            self.m_mediaCurrentWeirdNum = mediaWeirdNum
         self.m_mediaStartStopDisplay = loadOK
         return loadOK
 

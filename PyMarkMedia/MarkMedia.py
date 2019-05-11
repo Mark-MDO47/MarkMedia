@@ -252,8 +252,10 @@ class MainFrame ( wx.Frame ):
 
     # Virtual event handlers, overide them in your derived class
     def onBtnPrevFile( self, event ):
-        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
-        ignore = self.doLoadupTxtCurrMediaFile()
+        possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
+        if possibleIdx >= 0:
+            self.m_txtFileIdx = possibleIdx
+            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
 
 
     def onBtnPrev( self, event ):
@@ -291,8 +293,10 @@ class MainFrame ( wx.Frame ):
 
 
     def onBtnNextFile( self, event ):
-        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
-        ignore = self.doLoadupTxtCurrMediaFile()
+        possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
+        if possibleIdx >= 0:
+            self.m_txtFileIdx = possibleIdx
+            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
 
 
     def onBtnEnterVidNum( self, event ):
@@ -315,14 +319,18 @@ class MainFrame ( wx.Frame ):
     def OnFileOpen( self, event ):
         dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file", defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            self.DoLoadFile(path)
-            # self.m_mediactrl.SetInitialSize()
-            # self.m_mediaLength = None
+            loadOK = True
+            pathTxt = dlg.GetPath()
+            retn = self.doLoadTextFile(pathTxt)
+            if "OK" != retn:
+                wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+                loadOK = False
+            if loadOK:
+                loadOK = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
 
-    # time.ctime(os.path.getmtime(<<thepath>>))
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
+        prevStatus = self.m_staticTextStatus.GetLabel()
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
@@ -332,33 +340,22 @@ class MainFrame ( wx.Frame ):
             self.m_staticTextStatus.SetLabel("Status: %s" % txt)
             wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
             loadOK = False
-        if loadOK and (not self.m_mediactrl.Load(mediaFile)):
-            txt = "Unable to load media file %s: Unsupported format?" % mediaFile
-            self.m_staticTextStatus.SetLabel("Status: %s" % txt)
-            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
-            loadOK = False
         else:
-            # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
-            self.m_staticTextStatus.SetLabel("Status: %s (%s)" % (statusText, self.m_mediaMtime))
-            self.m_mediactrl.SetInitialSize()
-            self.GetSizer().Layout()
-            self.m_mediaMtime = time.ctime(os.path.getmtime(mediaFile))
-            self.m_mediaCurrentWeirdNum = mediaWeirdNum
+            if not self.m_mediactrl.Load(mediaFile):
+                txt = "Unable to load media file %s: Unsupported format?" % mediaFile
+                self.m_staticTextStatus.SetLabel("Status: %s" % txt)
+                wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
+                loadOK = False
+            else:
+                # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
+                self.m_staticTextStatus.SetLabel("Status: %s (%s)" % (statusText, self.m_mediaMtime))
+                self.m_mediactrl.SetInitialSize()
+                self.GetSizer().Layout()
+                self.m_mediaMtime = time.ctime(os.path.getmtime(mediaFile))
+                self.m_mediaCurrentWeirdNum = mediaWeirdNum
         self.m_mediaStartStopDisplay = loadOK
-        return loadOK
-
-    def doLoadupTxtCurrMediaFile( self ): # keep copying - this is in addition to OnFileOpen
-        return self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
-
-    def DoLoadFile(self, pathTxt): # keep copying - this is in addition to OnFileOpen
-        # self.m_buttonPlay.Disable() ### FIXME
-        loadOK = True
-        retn = self.doLoadTextFile(pathTxt)
-        if "OK" != retn:
-            wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
-            loadOK = False
-        if loadOK:
-            loadOK = self.doLoadupTxtCurrMediaFile()
+        if not loadOK:
+            self.m_staticTextStatus.SetLabel(prevStatus)
         return loadOK
 
     def fromMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen

@@ -93,12 +93,11 @@ class MainFrame extends wxFrame {
 
 		$bSizerPanel->Add( $this->m_textCtrl1, 0, wxALL|wxEXPAND, 5 );
 
-		$m_listBoxVidCommentsChoices = array();
-		$this->m_listBoxVidComments = new wxListBox( $this->m_panel1, wxID_ANY, wxDefaultPosition, wxDefaultSize, $m_listBoxVidCommentsChoices, wxLB_ALWAYS_SB|wxLB_HSCROLL|wxLB_SINGLE );
-		$this->m_listBoxVidComments->SetToolTip( "List of existing Video txt comments" );
-		$this->m_listBoxVidComments->SetMinSize( new wxSize( -1,300 ) );
+		$this->m_listCtrlVidComments = new wxListCtrl( $this->m_panel1, wxID_ANY, wxDefaultPosition, new wxSize( -1,-1 ), wxLC_REPORT|wxBORDER_SUNKEN );
+		$this->m_listCtrlVidComments->SetToolTip( "List of existing Video txt comments" );
+		$this->m_listCtrlVidComments->SetMinSize( new wxSize( -1,300 ) );
 
-		$bSizerPanel->Add( $this->m_listBoxVidComments, 0, wxALL|wxEXPAND, 5 );
+		$bSizerPanel->Add( $this->m_listCtrlVidComments, 0, wxALL|wxEXPAND, 5 );
 
 
 		$this->m_panel1->SetSizer( $bSizerPanel );
@@ -153,8 +152,6 @@ class MainFrame extends wxFrame {
 		$this->m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnEnterVidNum") );
 		$this->m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnLouder") );
 		$this->m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnSofter") );
-		$this->m_listBoxVidComments->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, array($this, "onLBoxVidComments") );
-		$this->m_listBoxVidComments->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, array($this, "onListBoxDClickVidComments") );
 		$this->Connect( $this->m_menuItemFileOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileOpen") );
 		$this->Connect( $this->m_menuItemFileSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSave") );
 		$this->Connect( $this->m_menuItemFileSaveAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSaveAs") );
@@ -203,14 +200,6 @@ class MainFrame extends wxFrame {
 	}
 
 	function onBtnSofter( $event ){
-		$event->Skip();
-	}
-
-	function onLBoxVidComments( $event ){
-		$event->Skip();
-	}
-
-	function onListBoxDClickVidComments( $event ){
 		$event->Skip();
 	}
 

@@ -2,6 +2,7 @@
 
 import sys
 import os
+import time
 from time import sleep
 
 ###########################################################################
@@ -90,6 +91,7 @@ class MainFrame ( wx.Frame ):
         self.m_mediaLoad = False  # True when media load done until timer processes it
         self.m_mediaStartStopDisplay = False # yet another media load flag
         self.m_mediaCurrentWeirdNum = "_0001"
+        self.m_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
@@ -176,12 +178,11 @@ class MainFrame ( wx.Frame ):
 
         bSizerPanel.Add( self.m_textCtrl1, 0, wx.ALL|wx.EXPAND, 5 )
 
-        m_listBoxVidCommentsChoices = []
-        self.m_listBoxVidComments = wx.ListBox( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBoxVidCommentsChoices, wx.LB_ALWAYS_SB|wx.LB_HSCROLL|wx.LB_SINGLE )
-        self.m_listBoxVidComments.SetToolTip( u"List of existing Video txt comments" )
-        self.m_listBoxVidComments.SetMinSize( wx.Size( -1,300 ) )
+        self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LC_REPORT|wx.BORDER_SUNKEN )
+        self.m_listCtrlVidComments.SetToolTip( u"List of existing Video txt comments" )
+        self.m_listCtrlVidComments.SetMinSize( wx.Size( -1,300 ) )
 
-        bSizerPanel.Add( self.m_listBoxVidComments, 0, wx.ALL|wx.EXPAND, 5 )
+        bSizerPanel.Add( self.m_listCtrlVidComments, 0, wx.ALL|wx.EXPAND, 5 )
 
 
         self.m_panel1.SetSizer( bSizerPanel )
@@ -236,8 +237,6 @@ class MainFrame ( wx.Frame ):
         self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
         self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
         self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
-        self.m_listBoxVidComments.Bind( wx.EVT_LISTBOX, self.onLBoxVidComments )
-        self.m_listBoxVidComments.Bind( wx.EVT_LISTBOX_DCLICK, self.onListBoxDClickVidComments )
         self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
         self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
         self.Bind( wx.EVT_MENU, self.onFileSaveAs, id = self.m_menuItemFileSaveAs.GetId() )
@@ -313,16 +312,6 @@ class MainFrame ( wx.Frame ):
 
 
 
-    def onLBoxVidComments( self, event ):
-        event.Skip()            # need to write this one
-
-
-
-    def onListBoxDClickVidComments( self, event ):
-        event.Skip()            # need to write this one
-
-
-
     def OnFileOpen( self, event ):
         dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file", defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
@@ -331,22 +320,29 @@ class MainFrame ( wx.Frame ):
             # self.m_mediactrl.SetInitialSize()
             # self.m_mediaLength = None
 
+    # time.ctime(os.path.getmtime(<<thepath>>))
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
         mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
-        if not self.m_mediactrl.Load(mediaFile):
-            txt = "Unable to load media file %s: Unsupported format?" % mediaFile
-            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
+        if False == os.path.exists(mediaFile):
+            txt = "Media file %s does not exist" % mediaFile
             self.m_staticTextStatus.SetLabel("Status: %s" % txt)
+            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
+            loadOK = False
+        if loadOK and (not self.m_mediactrl.Load(mediaFile)):
+            txt = "Unable to load media file %s: Unsupported format?" % mediaFile
+            self.m_staticTextStatus.SetLabel("Status: %s" % txt)
+            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
             loadOK = False
         else:
             # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
+            self.m_staticTextStatus.SetLabel("Status: %s (%s)" % (statusText, self.m_mediaMtime))
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
-            self.m_staticTextStatus.SetLabel("Status: %s" % statusText)
+            self.m_mediaMtime = time.ctime(os.path.getmtime(mediaFile))
             self.m_mediaCurrentWeirdNum = mediaWeirdNum
         self.m_mediaStartStopDisplay = loadOK
         return loadOK
@@ -404,7 +400,7 @@ class MainFrame ( wx.Frame ):
             good = False
         else:
             # FIXME let's cheat a little; we know some things about this...
-            last3 = "%3d" % (theNumber % 1000)
+            last3 = "%03d" % (theNumber % 1000)
             first2int = int(theNumber // 1000)
             firstint = int(first2int // len(self.MarksWeirdDigits[1]))
             secondint = first2int - firstint*len(self.MarksWeirdDigits[1])

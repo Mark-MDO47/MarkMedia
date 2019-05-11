@@ -21,7 +21,7 @@ events = []
 
 # cmds are checked one at a time, waiting until each is done in order before moving to the next
 cmds = [
-        ["afteraddtext", "coding: utf-8", "\nimport sys\nimport os\nfrom time import sleep\n", "unused"],
+        ["afteraddtext", "coding: utf-8", "\nimport sys\nimport os\nimport time\nfrom time import sleep\n", "unused"],
         ["afterskipto", "## http://www.wxformbuilder.org/", "#################################", "unused"],
         ["aftercopyfilefrom",  "import wx.xrc", "import gettext", "_00_DialogEnterVidNum.py"],
         ["afterskippastcopyentirefilefrom", "class MainFrame ( ", "def __init__( self, parent )", "_01_FrameInit_def.py"],

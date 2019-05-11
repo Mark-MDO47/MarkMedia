@@ -89,12 +89,11 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.bSizerPanel:Add( UI.m_textCtrl1, 0, wx.wxALL + wx.wxEXPAND, 5 )
 
-	UI.m_listBoxVidCommentsChoices = {}
-	UI.m_listBoxVidComments = wx.wxListBox( UI.m_panel1, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxDefaultSize, UI.m_listBoxVidCommentsChoices, wx.wxLB_ALWAYS_SB + wx.wxLB_HSCROLL + wx.wxLB_SINGLE )
-	UI.m_listBoxVidComments:SetToolTip( "List of existing Video txt comments" )
-	UI.m_listBoxVidComments:SetMinSize( wx.wxSize( -1,300 ) )
+	UI.m_listCtrlVidComments = wx.wxListCtrl( UI.m_panel1, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxSize( -1,-1 ), wx.wxLC_REPORT+wx.wxBORDER_SUNKEN )
+	UI.m_listCtrlVidComments:SetToolTip( "List of existing Video txt comments" )
+	UI.m_listCtrlVidComments:SetMinSize( wx.wxSize( -1,300 ) )
 
-	UI.bSizerPanel:Add( UI.m_listBoxVidComments, 0, wx.wxALL + wx.wxEXPAND, 5 )
+	UI.bSizerPanel:Add( UI.m_listCtrlVidComments, 0, wx.wxALL + wx.wxEXPAND, 5 )
 
 
 	UI.m_panel1:SetSizer( UI.bSizerPanel )
@@ -191,18 +190,6 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.m_buttonSofter:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
 	--implements onBtnSofter
-
-	event:Skip()
-	end )
-
-	UI.m_listBoxVidComments:Connect( wx.wxEVT_COMMAND_LISTBOX_SELECTED, function(event)
-	--implements onLBoxVidComments
-
-	event:Skip()
-	end )
-
-	UI.m_listBoxVidComments:Connect( wx.wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, function(event)
-	--implements onListBoxDClickVidComments
 
 	event:Skip()
 	end )

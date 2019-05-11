@@ -96,12 +96,11 @@ class MainFrame ( wx.Frame ):
 
 		bSizerPanel.Add( self.m_textCtrl1, 0, wx.ALL|wx.EXPAND, 5 )
 
-		m_listBoxVidCommentsChoices = []
-		self.m_listBoxVidComments = wx.ListBox( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBoxVidCommentsChoices, wx.LB_ALWAYS_SB|wx.LB_HSCROLL|wx.LB_SINGLE )
-		self.m_listBoxVidComments.SetToolTip( u"List of existing Video txt comments" )
-		self.m_listBoxVidComments.SetMinSize( wx.Size( -1,300 ) )
+		self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LC_REPORT|wx.BORDER_SUNKEN )
+		self.m_listCtrlVidComments.SetToolTip( u"List of existing Video txt comments" )
+		self.m_listCtrlVidComments.SetMinSize( wx.Size( -1,300 ) )
 
-		bSizerPanel.Add( self.m_listBoxVidComments, 0, wx.ALL|wx.EXPAND, 5 )
+		bSizerPanel.Add( self.m_listCtrlVidComments, 0, wx.ALL|wx.EXPAND, 5 )
 
 
 		self.m_panel1.SetSizer( bSizerPanel )
@@ -156,8 +155,6 @@ class MainFrame ( wx.Frame ):
 		self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
 		self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
 		self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
-		self.m_listBoxVidComments.Bind( wx.EVT_LISTBOX, self.onLBoxVidComments )
-		self.m_listBoxVidComments.Bind( wx.EVT_LISTBOX_DCLICK, self.onListBoxDClickVidComments )
 		self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSaveAs, id = self.m_menuItemFileSaveAs.GetId() )
@@ -196,12 +193,6 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def onBtnSofter( self, event ):
-		event.Skip()
-
-	def onLBoxVidComments( self, event ):
-		event.Skip()
-
-	def onListBoxDClickVidComments( self, event ):
 		event.Skip()
 
 	def OnFileOpen( self, event ):

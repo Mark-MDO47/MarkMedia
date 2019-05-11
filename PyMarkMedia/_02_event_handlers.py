@@ -66,7 +66,7 @@
                 self.m_mediactrl.SetVolume(max(0.0, self.m_mediactrl.GetVolume()-0.05))
 
 
-    def onLBoxVidComments( self, event ):
+    def onListBoxDClickVidComments( self, event ):
         event.Skip()            # need to write this one
 
 
@@ -82,22 +82,29 @@
             # self.m_mediactrl.SetInitialSize()
             # self.m_mediaLength = None
 
+    # time.ctime(os.path.getmtime(<<thepath>>))
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
         mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
-        if not self.m_mediactrl.Load(mediaFile):
-            txt = "Unable to load media file %s: Unsupported format?" % mediaFile
-            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
+        if False == os.path.exists(mediaFile):
+            txt = "Media file %s does not exist" % mediaFile
             self.m_staticTextStatus.SetLabel("Status: %s" % txt)
+            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
+            loadOK = False
+        if loadOK and (not self.m_mediactrl.Load(mediaFile)):
+            txt = "Unable to load media file %s: Unsupported format?" % mediaFile
+            self.m_staticTextStatus.SetLabel("Status: %s" % txt)
+            wx.MessageBox(txt, "ERROR", wx.ICON_ERROR | wx.OK)
             loadOK = False
         else:
             # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
+            self.m_staticTextStatus.SetLabel("Status: %s (%s)" % (statusText, self.m_mediaMtime))
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
-            self.m_staticTextStatus.SetLabel("Status: %s" % statusText)
+            self.m_mediaMtime = time.ctime(os.path.getmtime(mediaFile))
             self.m_mediaCurrentWeirdNum = mediaWeirdNum
         self.m_mediaStartStopDisplay = loadOK
         return loadOK
@@ -155,7 +162,7 @@
             good = False
         else:
             # FIXME let's cheat a little; we know some things about this...
-            last3 = "%3d" % (theNumber % 1000)
+            last3 = "%03d" % (theNumber % 1000)
             first2int = int(theNumber // 1000)
             firstint = int(first2int // len(self.MarksWeirdDigits[1]))
             secondint = first2int - firstint*len(self.MarksWeirdDigits[1])

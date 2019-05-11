@@ -971,11 +971,11 @@
                                     <property name="window_style"></property>
                                 </object>
                             </object>
-                            <object class="sizeritem" expanded="0">
+                            <object class="sizeritem" expanded="1">
                                 <property name="border">5</property>
                                 <property name="flag">wxALL|wxEXPAND</property>
                                 <property name="proportion">0</property>
-                                <object class="wxListBox" expanded="0">
+                                <object class="wxListCtrl" expanded="1">
                                     <property name="BottomDockable">1</property>
                                     <property name="LeftDockable">1</property>
                                     <property name="RightDockable">1</property>
@@ -989,7 +989,6 @@
                                     <property name="caption"></property>
                                     <property name="caption_visible">1</property>
                                     <property name="center_pane">0</property>
-                                    <property name="choices"></property>
                                     <property name="close_button">1</property>
                                     <property name="context_help"></property>
                                     <property name="context_menu">1</property>
@@ -1011,7 +1010,7 @@
                                     <property name="minimize_button">0</property>
                                     <property name="minimum_size">-1,300</property>
                                     <property name="moveable">1</property>
-                                    <property name="name">m_listBoxVidComments</property>
+                                    <property name="name">m_listCtrlVidComments</property>
                                     <property name="pane_border">1</property>
                                     <property name="pane_position"></property>
                                     <property name="pane_size"></property>
@@ -1020,8 +1019,8 @@
                                     <property name="pos"></property>
                                     <property name="resize">Resizable</property>
                                     <property name="show">1</property>
-                                    <property name="size"></property>
-                                    <property name="style">wxLB_ALWAYS_SB|wxLB_HSCROLL|wxLB_SINGLE</property>
+                                    <property name="size">-1,-1</property>
+                                    <property name="style">wxLC_REPORT</property>
                                     <property name="subclass">; ; forward_declare</property>
                                     <property name="toolbar_pane">0</property>
                                     <property name="tooltip">List of existing Video txt comments</property>
@@ -1031,9 +1030,7 @@
                                     <property name="validator_variable"></property>
                                     <property name="window_extra_style"></property>
                                     <property name="window_name"></property>
-                                    <property name="window_style"></property>
-                                    <event name="OnListBox">onLBoxVidComments</event>
-                                    <event name="OnListBoxDClick">onListBoxDClickVidComments</event>
+                                    <property name="window_style">wxBORDER_SUNKEN</property>
                                 </object>
                             </object>
                         </object>

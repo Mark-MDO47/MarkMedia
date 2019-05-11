@@ -8,6 +8,7 @@
         self.m_mediaLoad = False  # True when media load done until timer processes it
         self.m_mediaStartStopDisplay = False # yet another media load flag
         self.m_mediaCurrentWeirdNum = "_0001"
+        self.m_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 

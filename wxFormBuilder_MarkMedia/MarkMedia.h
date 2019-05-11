@@ -22,7 +22,7 @@
 #include <wx/button.h>
 #include <wx/sizer.h>
 #include <wx/textctrl.h>
-#include <wx/listbox.h>
+#include <wx/listctrl.h>
 #include <wx/panel.h>
 #include <wx/menu.h>
 #include <wx/timer.h>
@@ -52,7 +52,7 @@ class MainFrame : public wxFrame
 		wxButton* m_buttonLouder;
 		wxButton* m_buttonSofter;
 		wxTextCtrl* m_textCtrl1;
-		wxListBox* m_listBoxVidComments;
+		wxListCtrl* m_listCtrlVidComments;
 		wxMenuBar* m_menubarMainFrame;
 		wxMenu* m_menuFile;
 		wxMenu* m_menuHelp;
@@ -68,8 +68,6 @@ class MainFrame : public wxFrame
 		virtual void onBtnEnterVidNum( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnLouder( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnSofter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void onLBoxVidComments( wxCommandEvent& event ) { event.Skip(); }
-		virtual void onListBoxDClickVidComments( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSaveAs( wxCommandEvent& event ) { event.Skip(); }

@@ -90,11 +90,11 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	bSizerPanel->Add( m_textCtrl1, 0, wxALL|wxEXPAND, 5 );
 
-	m_listBoxVidComments = new wxListBox( m_panel1, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_ALWAYS_SB|wxLB_HSCROLL|wxLB_SINGLE );
-	m_listBoxVidComments->SetToolTip( wxT("List of existing Video txt comments") );
-	m_listBoxVidComments->SetMinSize( wxSize( -1,300 ) );
+	m_listCtrlVidComments = new wxListCtrl( m_panel1, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_REPORT|wxBORDER_SUNKEN );
+	m_listCtrlVidComments->SetToolTip( wxT("List of existing Video txt comments") );
+	m_listCtrlVidComments->SetMinSize( wxSize( -1,300 ) );
 
-	bSizerPanel->Add( m_listBoxVidComments, 0, wxALL|wxEXPAND, 5 );
+	bSizerPanel->Add( m_listCtrlVidComments, 0, wxALL|wxEXPAND, 5 );
 
 
 	m_panel1->SetSizer( bSizerPanel );
@@ -154,8 +154,6 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnEnterVidNum ), NULL, this );
 	m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnLouder ), NULL, this );
 	m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );
-	m_listBoxVidComments->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::onLBoxVidComments ), NULL, this );
-	m_listBoxVidComments->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( MainFrame::onListBoxDClickVidComments ), NULL, this );
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileOpen ), this, m_menuItemFileOpen->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onFileSave ), this, m_menuItemFileSave->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onFileSaveAs ), this, m_menuItemFileSaveAs->GetId());
@@ -177,8 +175,6 @@ MainFrame::~MainFrame()
 	m_buttonEnterVidNum->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnEnterVidNum ), NULL, this );
 	m_buttonLouder->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnLouder ), NULL, this );
 	m_buttonSofter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );
-	m_listBoxVidComments->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::onLBoxVidComments ), NULL, this );
-	m_listBoxVidComments->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( MainFrame::onListBoxDClickVidComments ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( MainFrame::onTimerMedia ) );
 
 }

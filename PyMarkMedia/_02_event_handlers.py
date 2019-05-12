@@ -155,8 +155,27 @@
                         infoFile[key] = -1
                         retn = "ERROR: file %s not in infoFile format" % fname
         if ("OK" == retn) and (infoFile["THE_MAX_IMGNUM"] > 0) and (infoFile["THE_MAX_MVINUM"] > 0):
+            # infoFile is good; store it
             self.m_infoFile = infoFile
-            print(infoFile)
+            # let's just see if the info in infoFile is up to date, shall we?
+            # FIXME Pix vs Movies
+            ignore, mediaWeirdNum = self.toMarksWeirdNumbers(infoFile["THE_MAX_MVINUM"])
+            mediaDirList = sorted(os.listdir((os.path.join(os.path.dirname(fname), 'movies', mediaWeirdNum[:2]))))
+            mp4List = []
+            for mDirFile in mediaDirList:
+                if mDirFile.endswith(".MP4"):
+                   mp4List.append(mDirFile)
+            # FIXME Pix vs Movies
+            expectedLastFile = "MVI"+mediaWeirdNum+".MP4"
+            found = -1
+            if expectedLastFile in mp4List:
+                found = mp4List.index(expectedLastFile)
+            if found < 0:
+                # FIXME Pix vs Movies
+                wx.MessageBox("Warning: directory structure does not include \"%s\" media directory files per infoFile %s" % ("movie", fname), "ERROR", wx.ICON_ERROR | wx.OK)
+            elif (found + 1) != len(mp4List):
+                ignore, decNum =  self.fromMarksWeirdNumbers(mp4List[-1][3:3+5])
+                wx.MessageBox("Warning: \"%s\" media directory files per infoFile %s\nExpected last file was %s (%d)\nActual last file in directory was %s (%d)" % ("movie", fname, expectedLastFile, infoFile["THE_MAX_MVINUM"], mp4List[-1], decNum), "ERROR", wx.ICON_ERROR | wx.OK)
         return retn
 
     def doLoadTextFile(self, fname): # keep copying - this is in addition to OnFileOpen

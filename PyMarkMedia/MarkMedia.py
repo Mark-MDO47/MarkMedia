@@ -182,6 +182,10 @@ class MainFrame ( wx.Frame ):
         self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LC_REPORT|wx.BORDER_SUNKEN )
         self.m_listCtrlVidComments.SetToolTip( u"List of existing Video txt comments" )
         self.m_listCtrlVidComments.SetMinSize( wx.Size( -1,300 ) )
+# start copying here
+        self.m_listCtrlVidComments.InsertColumn(0, 'MagicNum')
+        self.m_listCtrlVidComments.InsertColumn(1, 'Comment')
+
 
         bSizerPanel.Add( self.m_listCtrlVidComments, 0, wx.ALL|wx.EXPAND, 5 )
 
@@ -287,9 +291,11 @@ class MainFrame ( wx.Frame ):
 
     def onBtnNext( self, event ):
         ignore, mediaDecNum = self.fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
-        mediaDecNum += 1
-        ignore, weirdMediaNum = self.toMarksWeirdNumbers(mediaDecNum)
-        self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
+        # FIXME Pix vs Movies
+        if mediaDecNum < self.m_infoFile["THE_MAX_MVINUM"]:
+            mediaDecNum += 1
+            ignore, weirdMediaNum = self.toMarksWeirdNumbers(mediaDecNum)
+            self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
 
 
 
@@ -430,12 +436,27 @@ class MainFrame ( wx.Frame ):
             return "ERROR: file %s last line is not # ... END OF FILE" % fname
         self.m_txtFilePath = os.path.abspath(fname)
         self.rootDir = os.path.dirname(self.m_txtFilePath)
+        for line in self.m_txtFileLines:
+            self.doAddListCtrlLine(line, self.m_listCtrlVidComments.GetItemCount())
         self.m_txtFileIdx = len(self.m_txtFileLines)-1
         self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
         if self.m_txtFileIdx < 0:
             self.m_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname
+        self.m_listCtrlVidComments.EnsureVisible(self.m_listCtrlVidComments.GetItemCount())
         return retn
+
+    def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to OnFileOpen
+        # adds line to list control before specified position
+        mediaFlag, ignore = self.fromMarksWeirdNumbers(line, quiet=True)
+        if mediaFlag:
+            # media line
+            self.m_listCtrlVidComments.InsertItem(posn, line[:5])
+            self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
+        else:
+            # comment
+            self.m_listCtrlVidComments.InsertItem(posn, " ")
+            self.m_listCtrlVidComments.SetItem(posn, 1, line)
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
@@ -467,15 +488,20 @@ class MainFrame ( wx.Frame ):
             self.m_staticTextStatus.SetLabel(prevStatus)
         return loadOK
 
-    def fromMarksWeirdNumbers(self, theNumberText): # keep copying - this is in addition to OnFileOpen
+    def fromMarksWeirdNumbers(self, theNumberText, quiet = False): # keep copying - this is in addition to OnFileOpen
         # for historical reasons numbering is
         # leftmost digit: _01...9A...Z
         # next     digit: 01...9A...Z
         # next 3  digits: 01...9
         # (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
 
-        if type(theNumberText) != type('123'):
-            dlgRslt = wx.MessageBox("ERROR: cannot convert input type %s inside fromMarksWeirdNumbers()" % (type(theNumberText)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
+        if type(theNumberText) != type('_A123'):
+            if False == quiet:
+                dlgRslt = wx.MessageBox("ERROR: cannot convert input type %s - inside fromMarksWeirdNumbers()" % (type(theNumberText)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
+            good = False
+        elif len(theNumberText) < 5:
+            if False == quiet:
+                dlgRslt = wx.MessageBox("ERROR: string |%s| is too short; must be >= 5 - inside fromMarksWeirdNumbers()" % (theNumberText), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
             good = False
         theNumberText = theNumberText.upper()
         good = True
@@ -495,14 +521,15 @@ class MainFrame ( wx.Frame ):
                     break
         return good, converted
 
-    def toMarksWeirdNumbers(self, theNumber): # keep copying - this is in addition to OnFileOpen
+    def toMarksWeirdNumbers(self, theNumber, quiet = False): # keep copying - this is in addition to OnFileOpen
         # see fromMarksWeirdNumbers() for description of strange numbering scheme
         good = True
         converted = "_0000" # zero
         if type(theNumber) == type("123"): # if it is a string
             theNumber = int(theNumber)
         if type(theNumber) != type(123):
-            dlgRslt = wx.MessageBox("ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
+            if False == quiet:
+                dlgRslt = wx.MessageBox("ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
             good = False
         else:
             # FIXME let's cheat a little; we know some things about this...

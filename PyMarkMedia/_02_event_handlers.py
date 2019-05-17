@@ -213,6 +213,11 @@
             # comment
             self.m_listCtrlVidComments.InsertItem(posn, " ")
             self.m_listCtrlVidComments.SetItem(posn, 1, line)
+        # alternating colors
+        if posn % 2:
+            self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")
+        else:
+            self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "yellow")
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True

@@ -154,6 +154,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnEnterVidNum ), NULL, this );
 	m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnLouder ), NULL, this );
 	m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );
+	m_listCtrlVidComments->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( MainFrame::onListCtrlActivated ), NULL, this );
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::OnFileOpen ), this, m_menuItemFileOpen->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onFileSave ), this, m_menuItemFileSave->GetId());
 	m_menuFile->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::onFileSaveAs ), this, m_menuItemFileSaveAs->GetId());
@@ -175,6 +176,7 @@ MainFrame::~MainFrame()
 	m_buttonEnterVidNum->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnEnterVidNum ), NULL, this );
 	m_buttonLouder->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnLouder ), NULL, this );
 	m_buttonSofter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::onBtnSofter ), NULL, this );
+	m_listCtrlVidComments->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( MainFrame::onListCtrlActivated ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( MainFrame::onTimerMedia ) );
 
 }

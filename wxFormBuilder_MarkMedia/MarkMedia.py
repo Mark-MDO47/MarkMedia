@@ -155,6 +155,7 @@ class MainFrame ( wx.Frame ):
 		self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
 		self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
 		self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
+		self.m_listCtrlVidComments.Bind( wx.EVT_LIST_ITEM_ACTIVATED, self.onListCtrlActivated )
 		self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSaveAs, id = self.m_menuItemFileSaveAs.GetId() )
@@ -193,6 +194,9 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def onBtnSofter( self, event ):
+		event.Skip()
+
+	def onListCtrlActivated( self, event ):
 		event.Skip()
 
 	def OnFileOpen( self, event ):

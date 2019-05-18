@@ -194,6 +194,12 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 	event:Skip()
 	end )
 
+	UI.m_listCtrlVidComments:Connect( wx.wxEVT_COMMAND_LIST_ITEM_ACTIVATED, function(event)
+	--implements onListCtrlActivated
+
+	event:Skip()
+	end )
+
 	UI.MainFrame:Connect( wx.wxID_ANY ,wx.wxEVT_COMMAND_MENU_SELECTED , function(event)
 	--implements OnFileOpen
 

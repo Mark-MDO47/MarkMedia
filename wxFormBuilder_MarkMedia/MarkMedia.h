@@ -68,6 +68,7 @@ class MainFrame : public wxFrame
 		virtual void onBtnEnterVidNum( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnLouder( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnSofter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void onListCtrlActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSaveAs( wxCommandEvent& event ) { event.Skip(); }

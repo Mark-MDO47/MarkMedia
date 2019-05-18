@@ -152,6 +152,7 @@ class MainFrame extends wxFrame {
 		$this->m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnEnterVidNum") );
 		$this->m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnLouder") );
 		$this->m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnSofter") );
+		$this->m_listCtrlVidComments->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, array($this, "onListCtrlActivated") );
 		$this->Connect( $this->m_menuItemFileOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileOpen") );
 		$this->Connect( $this->m_menuItemFileSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSave") );
 		$this->Connect( $this->m_menuItemFileSaveAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSaveAs") );
@@ -200,6 +201,10 @@ class MainFrame extends wxFrame {
 	}
 
 	function onBtnSofter( $event ){
+		$event->Skip();
+	}
+
+	function onListCtrlActivated( $event ){
 		$event->Skip();
 	}
 

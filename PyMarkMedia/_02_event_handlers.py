@@ -176,7 +176,7 @@
                 # FIXME Pix vs Movies
                 wx.MessageBox("Warning: directory structure does not include \"%s\" media directory files per infoFile %s" % ("movie", fname), "ERROR", wx.ICON_ERROR | wx.OK)
             elif (found + 1) != len(mp4List):
-                ignore, decNum =  self.fromMarksWeirdNumbers(mp4List[-1][3:3+5])
+                ignore, decNum =  self.fromMarksWeirdNumbers(mp4List[-1][3:3+5], quiet=True)
                 wx.MessageBox("Warning: \"%s\" media directory files per infoFile %s\nExpected last file was %s (%d)\nActual last file in directory was %s (%d)" % ("movie", fname, expectedLastFile, infoFile["THE_MAX_MVINUM"], mp4List[-1], decNum), "ERROR", wx.ICON_ERROR | wx.OK)
         return retn
 
@@ -201,23 +201,6 @@
             retn = "ERROR: file %s has no non-comment lines" % fname
         self.m_listCtrlVidComments.EnsureVisible(self.m_listCtrlVidComments.GetItemCount())
         return retn
-
-    def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to OnFileOpen
-        # adds line to list control before specified position
-        mediaFlag, ignore = self.fromMarksWeirdNumbers(line, quiet=True)
-        if mediaFlag:
-            # media line
-            self.m_listCtrlVidComments.InsertItem(posn, line[:5])
-            self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
-        else:
-            # comment
-            self.m_listCtrlVidComments.InsertItem(posn, " ")
-            self.m_listCtrlVidComments.SetItem(posn, 1, line)
-        # alternating colors
-        if posn % 2:
-            self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")
-        else:
-            self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "yellow")
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
@@ -315,13 +298,33 @@
             idx += direc
             if (idx < 0) or (idx >= len(self.m_txtFileLines)):
                 break
-            good, ignore = self.fromMarksWeirdNumbers(self.m_txtFileLines[idx])
+            good, ignore = self.fromMarksWeirdNumbers(self.m_txtFileLines[idx], quiet=True)
             if good != True:
                 continue
             else:
                 foundit = idx
                 break
         return foundit
+
+    def onListCtrlActivated(self, event):
+        event.Skip()            # need to write this one
+
+    def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to onListCtrlActivated
+        # adds line to list control before specified position
+        mediaFlag, ignore = self.fromMarksWeirdNumbers(line, quiet=True)
+        if mediaFlag:
+            # media line
+            self.m_listCtrlVidComments.InsertItem(posn, line[:5])
+            self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
+        else:
+            # comment
+            self.m_listCtrlVidComments.InsertItem(posn, " ")
+            self.m_listCtrlVidComments.SetItem(posn, 1, line)
+        # alternating colors
+        if posn % 2:
+            self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")
+        else:
+            self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "yellow")
 
     def onFileSave( self, event ):
         event.Skip()            # need to write this one

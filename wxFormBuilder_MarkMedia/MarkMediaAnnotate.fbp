@@ -1031,6 +1031,7 @@
                                     <property name="window_extra_style"></property>
                                     <property name="window_name"></property>
                                     <property name="window_style">wxBORDER_SUNKEN</property>
+                                    <event name="OnListItemActivated">onListCtrlActivated</event>
                                 </object>
                             </object>
                         </object>

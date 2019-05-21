@@ -84,10 +84,10 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.bSizerPanel:Add( UI.bSizer3, 0, wx.wxALIGN_CENTER_HORIZONTAL, 5 )
 
-	UI.m_textCtrl1 = wx.wxTextCtrl( UI.m_panel1, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, 0 )
-	UI.m_textCtrl1:SetToolTip( "Enter/Edit Comment" )
+	UI.m_textCtrlEntry = wx.wxTextCtrl( UI.m_panel1, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxTE_NOHIDESEL + wx.wxTE_NO_VSCROLL + wx.wxTE_PROCESS_ENTER )
+	UI.m_textCtrlEntry:SetToolTip( "Enter/Edit Comment" )
 
-	UI.bSizerPanel:Add( UI.m_textCtrl1, 0, wx.wxALL + wx.wxEXPAND, 5 )
+	UI.bSizerPanel:Add( UI.m_textCtrlEntry, 0, wx.wxALL + wx.wxEXPAND, 5 )
 
 	UI.m_listCtrlVidComments = wx.wxListCtrl( UI.m_panel1, wx.wxID_ANY, wx.wxDefaultPosition, wx.wxSize( -1,-1 ), wx.wxLC_REPORT+wx.wxBORDER_SUNKEN )
 	UI.m_listCtrlVidComments:SetToolTip( "List of existing Video txt comments" )
@@ -190,6 +190,12 @@ UI.MainFrame = wx.wxFrame (wx.NULL, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wx
 
 	UI.m_buttonSofter:Connect( wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
 	--implements onBtnSofter
+
+	event:Skip()
+	end )
+
+	UI.m_textCtrlEntry:Connect( wx.wxEVT_COMMAND_TEXT_ENTER, function(event)
+	--implements onTextCtrlEntry
 
 	event:Skip()
 	end )

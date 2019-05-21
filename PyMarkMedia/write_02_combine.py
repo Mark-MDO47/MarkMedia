@@ -53,6 +53,7 @@ events = [
 cmds =  [
             ["afteraddtext",  "import wx.xrc", "import wx.media\n", "unused"],
             ["afteraddtext", "bSizerPanel.Add( self.m_staticTextStatus,", "        self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))\n        bSizerPanel.Add( self.m_mediactrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )\n\n", "unused"] # add m_mediactrl in place of placeholder m_notebookMediaCtrl
+            ###   ["afteraddtext", "self.Centre( wx.BOTH )", "\n        self.wholePanel = self.Panel(self)\n", "unused"] # add self.wholePanel
         ]
 
 data = {"events": events, "cmds": cmds, "inpFile": inpFile, "otpFile": otpFile}

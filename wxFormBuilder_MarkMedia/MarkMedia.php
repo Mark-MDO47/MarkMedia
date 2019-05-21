@@ -88,10 +88,10 @@ class MainFrame extends wxFrame {
 
 		$bSizerPanel->Add( $bSizer3, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-		$this->m_textCtrl1 = new wxTextCtrl( $this->m_panel1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-		$this->m_textCtrl1->SetToolTip( "Enter/Edit Comment" );
+		$this->m_textCtrlEntry = new wxTextCtrl( $this->m_panel1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_NOHIDESEL|wxTE_NO_VSCROLL|wxTE_PROCESS_ENTER );
+		$this->m_textCtrlEntry->SetToolTip( "Enter/Edit Comment" );
 
-		$bSizerPanel->Add( $this->m_textCtrl1, 0, wxALL|wxEXPAND, 5 );
+		$bSizerPanel->Add( $this->m_textCtrlEntry, 0, wxALL|wxEXPAND, 5 );
 
 		$this->m_listCtrlVidComments = new wxListCtrl( $this->m_panel1, wxID_ANY, wxDefaultPosition, new wxSize( -1,-1 ), wxLC_REPORT|wxBORDER_SUNKEN );
 		$this->m_listCtrlVidComments->SetToolTip( "List of existing Video txt comments" );
@@ -152,6 +152,7 @@ class MainFrame extends wxFrame {
 		$this->m_buttonEnterVidNum->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnEnterVidNum") );
 		$this->m_buttonLouder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnLouder") );
 		$this->m_buttonSofter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, array($this, "onBtnSofter") );
+		$this->m_textCtrlEntry->Connect( wxEVT_COMMAND_TEXT_ENTER, array($this, "onTextCtrlEntry") );
 		$this->m_listCtrlVidComments->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, array($this, "onListCtrlActivated") );
 		$this->Connect( $this->m_menuItemFileOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "OnFileOpen") );
 		$this->Connect( $this->m_menuItemFileSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, array($this, "onFileSave") );
@@ -201,6 +202,10 @@ class MainFrame extends wxFrame {
 	}
 
 	function onBtnSofter( $event ){
+		$event->Skip();
+	}
+
+	function onTextCtrlEntry( $event ){
 		$event->Skip();
 	}
 

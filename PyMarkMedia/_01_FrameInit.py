@@ -10,6 +10,7 @@
         self.m_mediaCurrentWeirdNum = "_0001"
         self.m_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
         self.m_infoFile = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
+        self.m_listCtrlInfo = {} # "validWeirdNum", others TBD
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 

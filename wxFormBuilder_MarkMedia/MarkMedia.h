@@ -51,7 +51,7 @@ class MainFrame : public wxFrame
 		wxButton* m_buttonEnterVidNum;
 		wxButton* m_buttonLouder;
 		wxButton* m_buttonSofter;
-		wxTextCtrl* m_textCtrl1;
+		wxTextCtrl* m_textCtrlEntry;
 		wxListCtrl* m_listCtrlVidComments;
 		wxMenuBar* m_menubarMainFrame;
 		wxMenu* m_menuFile;
@@ -68,6 +68,7 @@ class MainFrame : public wxFrame
 		virtual void onBtnEnterVidNum( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnLouder( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onBtnSofter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void onTextCtrlEntry( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onListCtrlActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void onFileSave( wxCommandEvent& event ) { event.Skip(); }

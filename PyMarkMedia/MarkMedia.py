@@ -93,6 +93,7 @@ class MainFrame ( wx.Frame ):
         self.m_mediaCurrentWeirdNum = "_0001"
         self.m_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
         self.m_infoFile = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
+        self.m_listCtrlInfo = {} # "validWeirdNum", others TBD
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
@@ -174,10 +175,10 @@ class MainFrame ( wx.Frame ):
 
         bSizerPanel.Add( bSizer3, 0, wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
-        self.m_textCtrl1 = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl1.SetToolTip( u"Enter/Edit Comment" )
+        self.m_textCtrlEntry = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_NOHIDESEL|wx.TE_NO_VSCROLL|wx.TE_PROCESS_ENTER )
+        self.m_textCtrlEntry.SetToolTip( u"Enter/Edit Comment" )
 
-        bSizerPanel.Add( self.m_textCtrl1, 0, wx.ALL|wx.EXPAND, 5 )
+        bSizerPanel.Add( self.m_textCtrlEntry, 0, wx.ALL|wx.EXPAND, 5 )
 
         self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LC_REPORT|wx.BORDER_SUNKEN )
         self.m_listCtrlVidComments.SetToolTip( u"List of existing Video txt comments" )
@@ -244,6 +245,7 @@ class MainFrame ( wx.Frame ):
         self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
         self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
         self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
+        self.m_textCtrlEntry.Bind( wx.EVT_TEXT_ENTER, self.onTextCtrlEntry )
         self.m_listCtrlVidComments.Bind( wx.EVT_LIST_ITEM_ACTIVATED, self.onListCtrlActivated )
         self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
         self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
@@ -326,8 +328,29 @@ class MainFrame ( wx.Frame ):
 
 
 
+    def onTextCtrlEntry( self, event ):
+        event.Skip()
+
     def onListCtrlActivated( self, event ):
-        event.Skip()            # need to write this one
+        # print("OnItemActivated: %s - %s    TopItem: %s" % (event.Index, self.m_listCtrlVidComments.GetItemText(event.Index), self.m_listCtrlVidComments.GetTopItem()))
+        # print("  GetColumnWidth() [0] [1]: [%s] [%s]" % (self.m_listCtrlVidComments.GetColumnWidth(0), self.m_listCtrlVidComments.GetColumnWidth(1)))
+        # print("  GetItemPosition(event.Index): %s" % self.m_listCtrlVidComments.GetItemPosition(event.Index))
+        # print("  GetItemRect(event.Index): %s" % self.m_listCtrlVidComments.GetItemRect(event.Index))
+        myRow = event.Index
+        myCol = -1
+        myX, myY = self.m_listCtrlVidComments.ScreenToClient(wx.GetMousePosition())
+        # print("myX=%d" % myX)
+        numCols = self.m_listCtrlVidComments.GetColumnCount() # actually I know there are just two
+        # print("numCols=%d" % numCols)
+        for idx in range(numCols):
+            # print("   idx=%d myX=%d" % (idx, myX))
+            colWidth = self.m_listCtrlVidComments.GetColumnWidth(idx)
+            # print("   colWidth=%d" % colWidth)
+            if myX < colWidth:
+               myCol = idx
+               break
+            myX -= colWidth
+        print("myRow=%d myCol=%d" % (myRow, myCol))
 
     def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to onListCtrlActivated
         # adds line to list control before specified position
@@ -336,10 +359,12 @@ class MainFrame ( wx.Frame ):
             # media line
             self.m_listCtrlVidComments.InsertItem(posn, line[:5])
             self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
+            self.m_listCtrlInfo[posn] = {"validWeirdNum": line[:5]}
         else:
             # comment
             self.m_listCtrlVidComments.InsertItem(posn, " ")
             self.m_listCtrlVidComments.SetItem(posn, 1, line)
+            self.m_listCtrlInfo[posn] = {"validWeirdNum": ""}
         # alternating colors
         if posn % 2:
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")
@@ -467,12 +492,13 @@ class MainFrame ( wx.Frame ):
         if self.m_txtFileIdx < 0:
             self.m_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname
-        self.m_listCtrlVidComments.EnsureVisible(self.m_listCtrlVidComments.GetItemCount())
+        self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
         return retn
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
         prevStatus = self.m_staticTextStatus.GetLabel()
+        prevTextEntry = self.m_textCtrlEntry.GetValue()
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
@@ -498,6 +524,10 @@ class MainFrame ( wx.Frame ):
         self.m_mediaStartStopDisplay = loadOK
         if not loadOK:
             self.m_staticTextStatus.SetLabel(prevStatus)
+            self.m_textCtrlEntry.ChangeValue(prevTextEntry) # avoid generating wxEVT_TEXT with SetValue
+        else:
+            pass # MDOMDO FIXME get text if landed on a line
+            # FIXME set the listctrl to select if landed on a line
         return loadOK
 
     def fromMarksWeirdNumbers(self, theNumberText, quiet = False): # keep copying - this is in addition to OnFileOpen

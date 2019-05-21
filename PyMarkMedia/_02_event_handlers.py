@@ -199,12 +199,13 @@
         if self.m_txtFileIdx < 0:
             self.m_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname
-        self.m_listCtrlVidComments.EnsureVisible(self.m_listCtrlVidComments.GetItemCount())
+        self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
         return retn
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
         prevStatus = self.m_staticTextStatus.GetLabel()
+        prevTextEntry = self.m_textCtrlEntry.GetValue()
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
@@ -230,6 +231,10 @@
         self.m_mediaStartStopDisplay = loadOK
         if not loadOK:
             self.m_staticTextStatus.SetLabel(prevStatus)
+            self.m_textCtrlEntry.ChangeValue(prevTextEntry) # avoid generating wxEVT_TEXT with SetValue
+        else:
+            pass # MDOMDO FIXME get text if landed on a line
+            # FIXME set the listctrl to select if landed on a line
         return loadOK
 
     def fromMarksWeirdNumbers(self, theNumberText, quiet = False): # keep copying - this is in addition to OnFileOpen
@@ -306,8 +311,26 @@
                 break
         return foundit
 
-    def onListCtrlActivated(self, event):
-        event.Skip()            # need to write this one
+    def onListCtrlActivated( self, event ):
+        # print("OnItemActivated: %s - %s    TopItem: %s" % (event.Index, self.m_listCtrlVidComments.GetItemText(event.Index), self.m_listCtrlVidComments.GetTopItem()))
+        # print("  GetColumnWidth() [0] [1]: [%s] [%s]" % (self.m_listCtrlVidComments.GetColumnWidth(0), self.m_listCtrlVidComments.GetColumnWidth(1)))
+        # print("  GetItemPosition(event.Index): %s" % self.m_listCtrlVidComments.GetItemPosition(event.Index))
+        # print("  GetItemRect(event.Index): %s" % self.m_listCtrlVidComments.GetItemRect(event.Index))
+        myRow = event.Index
+        myCol = -1
+        myX, myY = self.m_listCtrlVidComments.ScreenToClient(wx.GetMousePosition())
+        # print("myX=%d" % myX)
+        numCols = self.m_listCtrlVidComments.GetColumnCount() # actually I know there are just two
+        # print("numCols=%d" % numCols)
+        for idx in range(numCols):
+            # print("   idx=%d myX=%d" % (idx, myX))
+            colWidth = self.m_listCtrlVidComments.GetColumnWidth(idx)
+            # print("   colWidth=%d" % colWidth)
+            if myX < colWidth:
+               myCol = idx
+               break
+            myX -= colWidth
+        print("myRow=%d myCol=%d" % (myRow, myCol))
 
     def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to onListCtrlActivated
         # adds line to list control before specified position
@@ -316,10 +339,12 @@
             # media line
             self.m_listCtrlVidComments.InsertItem(posn, line[:5])
             self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
+            self.m_listCtrlInfo[posn] = {"validWeirdNum": line[:5]}
         else:
             # comment
             self.m_listCtrlVidComments.InsertItem(posn, " ")
             self.m_listCtrlVidComments.SetItem(posn, 1, line)
+            self.m_listCtrlInfo[posn] = {"validWeirdNum": ""}
         # alternating colors
         if posn % 2:
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")

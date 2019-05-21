@@ -147,7 +147,8 @@
 					<option>0</option>
 					<flag>wxALL|wxEXPAND</flag>
 					<border>5</border>
-					<object class="wxTextCtrl" name="m_textCtrl1">
+					<object class="wxTextCtrl" name="m_textCtrlEntry">
+						<style>wxTE_NOHIDESEL|wxTE_NO_VSCROLL|wxTE_PROCESS_ENTER</style>
 						<tooltip>Enter/Edit Comment</tooltip>
 						<value></value>
 					</object>

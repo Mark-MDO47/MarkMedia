@@ -91,10 +91,10 @@ class MainFrame ( wx.Frame ):
 
 		bSizerPanel.Add( bSizer3, 0, wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
-		self.m_textCtrl1 = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_textCtrl1.SetToolTip( u"Enter/Edit Comment" )
+		self.m_textCtrlEntry = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_NOHIDESEL|wx.TE_NO_VSCROLL|wx.TE_PROCESS_ENTER )
+		self.m_textCtrlEntry.SetToolTip( u"Enter/Edit Comment" )
 
-		bSizerPanel.Add( self.m_textCtrl1, 0, wx.ALL|wx.EXPAND, 5 )
+		bSizerPanel.Add( self.m_textCtrlEntry, 0, wx.ALL|wx.EXPAND, 5 )
 
 		self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LC_REPORT|wx.BORDER_SUNKEN )
 		self.m_listCtrlVidComments.SetToolTip( u"List of existing Video txt comments" )
@@ -155,6 +155,7 @@ class MainFrame ( wx.Frame ):
 		self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
 		self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
 		self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
+		self.m_textCtrlEntry.Bind( wx.EVT_TEXT_ENTER, self.onTextCtrlEntry )
 		self.m_listCtrlVidComments.Bind( wx.EVT_LIST_ITEM_ACTIVATED, self.onListCtrlActivated )
 		self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
 		self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
@@ -194,6 +195,9 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def onBtnSofter( self, event ):
+		event.Skip()
+
+	def onTextCtrlEntry( self, event ):
 		event.Skip()
 
 	def onListCtrlActivated( self, event ):

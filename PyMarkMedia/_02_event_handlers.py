@@ -233,9 +233,31 @@
             self.m_staticTextStatus.SetLabel(prevStatus)
             self.m_textCtrlEntry.ChangeValue(prevTextEntry) # avoid generating wxEVT_TEXT with SetValue
         else:
-            pass # MDOMDO FIXME get text if landed on a line
-            # FIXME set the listctrl to select if landed on a line
+            self.m_listCtrlSlctd["prev"] = self.m_listCtrlSlctd["curr"]
+            self.m_listCtrlSlctd["curr"] = mediaWeirdNum
+            theListCtrlLine = self.getListCtrlLine(self.m_listCtrlSlctd["prev"])
+            if theListCtrlLine >= 0:
+                self.m_listCtrlVidComments.Select(theListCtrlLine, 0)
+            bestMatchLine = self.getListCtrlLine(mediaWeirdNum)
+            if bestMatchLine >= 0:
+                self.m_txtFileIdx = bestMatchLine
+                self.m_listCtrlVidComments.Select(self.m_txtFileIdx, 1)
+                self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
+                # MDOMDO FIXME get text if landed on a line
+            else:
+                # MDOMDO FIXME save edit if different than previous
+                # MDOMDO FIXME clear text from edit field
+                pass
         return loadOK
+
+    def getListCtrlLine(self, mediaWeirdNum): # keep copying - this is in addition to OnFileOpen
+        lineNum = -1
+        # FIXME make it choose the same one the user clicked if more than one of same in listctrl
+        if mediaWeirdNum in self.m_listCtrlInfo.keys():
+            lineNum = self.m_listCtrlInfo[mediaWeirdNum]["line"][0]
+        return lineNum
+
+
 
     def fromMarksWeirdNumbers(self, theNumberText, quiet = False): # keep copying - this is in addition to OnFileOpen
         # for historical reasons numbering is
@@ -339,12 +361,18 @@
             # media line
             self.m_listCtrlVidComments.InsertItem(posn, line[:5])
             self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
-            self.m_listCtrlInfo[posn] = {"validWeirdNum": line[:5]}
+            if line[:5] in self.m_listCtrlInfo.keys():
+                self.m_listCtrlInfo[line[:5]]["line"].append(posn)
+            else:
+                self.m_listCtrlInfo[line[:5]] = {"line": [posn]}
         else:
             # comment
             self.m_listCtrlVidComments.InsertItem(posn, " ")
             self.m_listCtrlVidComments.SetItem(posn, 1, line)
-            self.m_listCtrlInfo[posn] = {"validWeirdNum": ""}
+            if " " in self.m_listCtrlInfo.keys():
+                self.m_listCtrlInfo[" "]["line"].append(posn)
+            else:
+                self.m_listCtrlInfo[" "] = {"line": [posn]}
         # alternating colors
         if posn % 2:
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")

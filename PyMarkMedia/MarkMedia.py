@@ -95,6 +95,8 @@ class MainFrame ( wx.Frame ):
         self.m_infoFile = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
         self.m_listCtrlInfo = {} # [validWeirdNum] = {"line": -1} , others TBD
         self.m_listCtrlSlctd = {"prev": -1, "curr": -1}
+        self.m_textCtrlEntry_unchanged = ""
+        self.m_textCtrlEntry_edited = ""
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
@@ -504,8 +506,8 @@ class MainFrame ( wx.Frame ):
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
-        prevStatus = self.m_staticTextStatus.GetLabel()
-        prevTextEntry = self.m_textCtrlEntry.GetValue()
+        nowStatus = self.m_staticTextStatus.GetLabel()
+        nowTextCtrlEntry = self.m_textCtrlEntry.GetValue()
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
         # FIXME Pix vs Movies
         self.m_mediaLength = None
@@ -530,25 +532,31 @@ class MainFrame ( wx.Frame ):
                 self.m_mediaCurrentWeirdNum = mediaWeirdNum
         self.m_mediaStartStopDisplay = loadOK
         if not loadOK:
-            self.m_staticTextStatus.SetLabel(prevStatus)
-            self.m_textCtrlEntry.ChangeValue(prevTextEntry) # avoid generating wxEVT_TEXT with SetValue
+            self.m_staticTextStatus.SetLabel(nowStatus)
+            self.m_textCtrlEntry.ChangeValue(nowTextCtrlEntry) # avoid generating wxEVT_TEXT with SetValue
         else:
+            if nowTextCtrlEntry != self.m_textCtrlEntry_unchanged:
+               pass # FIXME save edited text
             self.m_listCtrlSlctd["prev"] = self.m_listCtrlSlctd["curr"]
             self.m_listCtrlSlctd["curr"] = mediaWeirdNum
             theListCtrlLine = self.getListCtrlLine(self.m_listCtrlSlctd["prev"])
             if theListCtrlLine >= 0:
                 self.m_listCtrlVidComments.Select(theListCtrlLine, 0)
             bestMatchLine = self.getListCtrlLine(mediaWeirdNum)
-            if bestMatchLine >= 0:
+            if bestMatchLine >= 0: # landed on a line in the text file
                 self.m_txtFileIdx = bestMatchLine
                 self.m_listCtrlVidComments.Select(self.m_txtFileIdx, 1)
                 self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
-                # MDOMDO FIXME get text if landed on a line
-            else:
-                # MDOMDO FIXME save edit if different than previous
-                # MDOMDO FIXME clear text from edit field
+                self.m_textCtrlEntry_unchanged = self.m_textCtrlEntry_edited = self.m_txtFileLines[bestMatchLine]
+                self.m_textCtrlEntry.ChangeValue(self.m_textCtrlEntry_unchanged) # avoid generating wxEVT_TEXT with SetValue
+            else: # did not land on a line in the text file
+                self.m_textCtrlEntry_unchanged = self.m_textCtrlEntry_edited = ""
+                self.m_textCtrlEntry.ChangeValue("") # avoid generating wxEVT_TEXT with SetValue
                 pass
         return loadOK
+
+        self.m_textCtrlEntry_unchanged = ""
+        self.m_textCtrlEntry_edited = ""
 
     def getListCtrlLine(self, mediaWeirdNum): # keep copying - this is in addition to OnFileOpen
         lineNum = -1

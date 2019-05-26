@@ -12,6 +12,8 @@
         self.m_infoFile = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
         self.m_listCtrlInfo = {} # [validWeirdNum] = {"line": -1} , others TBD
         self.m_listCtrlSlctd = {"prev": -1, "curr": -1}
+        self.m_textCtrlEntry_unchanged = ""
+        self.m_textCtrlEntry_edited = ""
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 

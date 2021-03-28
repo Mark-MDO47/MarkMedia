@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+###########################################################################
+#
+# Author: Mark Olson 2018
+#
+# This is to help me manage my personal photo and video collection.
+# 
+###########################################################################
+
+
 import sys
 import os
 import time
@@ -15,6 +24,85 @@ import wx.xrc
 import wx.media
 import gettext
 _ = gettext.gettext
+
+###########################################################################
+## some globals - need use by everyone
+###########################################################################
+
+# for historical reasons numbering is
+#   leftmost digit: _01...9A...Z re: [_0-9A-Z]
+#   next     digit: 01...9A...Z  re: [0-9A-Z]
+#   next 3  digits: 01...9       re: [0-9]
+#   (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
+MarksWeirdDigits = ["_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                    "0123456789",
+                    "0123456789",
+                    "0123456789"
+                   ]
+
+
+def fromMarksWeirdNumbers(theNumberText, quiet=False):  # keep copying - this is in addition to OnFileOpen
+    if type(theNumberText) != type('_A123'):
+        if False == quiet:
+            dlgRslt = wx.MessageBox(
+                "ERROR: cannot convert input type %s - inside fromMarksWeirdNumbers()" % (type(theNumberText)),
+                "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
+        good = False
+    elif len(theNumberText) < 5:
+        if False == quiet:
+            dlgRslt = wx.MessageBox(
+                "ERROR: string |%s| is too short; must be >= 5 - inside fromMarksWeirdNumbers()" % (theNumberText),
+                "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
+        good = False
+    theNumberText = theNumberText.upper()
+    good = True
+    converted = 0
+    if len(theNumberText) < len(MarksWeirdDigits):
+        good = False
+        converted = -1
+    if good:
+        for idx in range(len(MarksWeirdDigits)):
+            converted *= len(MarksWeirdDigits[idx])
+            tmp = MarksWeirdDigits[idx].find(theNumberText[idx])
+            if -1 != tmp:
+                converted += tmp
+            else:
+                good = False
+                converted = -1
+                break
+    return good, converted
+
+
+def toMarksWeirdNumbers(theNumber, quiet=False):  # keep copying - this is in addition to OnFileOpen
+    # see MarksWeirdDigits[] for description of strange numbering scheme
+    good = True
+    converted = "_0000"  # zero
+    if type(theNumber) == type("123"):  # if it is a string
+        theNumber = int(theNumber)
+    if type(theNumber) != type(123):
+        if False == quiet:
+            dlgRslt = wx.MessageBox(
+                "ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)),
+                "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
+        good = False
+    else:
+        # FIXME let's cheat a little; we know some things about this...
+        last3 = "%03d" % (theNumber % 1000)
+        first2int = int(theNumber // 1000)
+        firstint = int(first2int // len(MarksWeirdDigits[1]))
+        secondint = first2int - firstint * len(MarksWeirdDigits[1])
+        if firstint > len(MarksWeirdDigits[0]):
+            theMax = ((len(MarksWeirdDigits[0]) - 1) * len(MarksWeirdDigits[1]) + (
+                        len(MarksWeirdDigits[1]) - 1)) * 1000 + 999
+            dlgRslt = wx.MessageBox(
+                "ERROR: cannot convert %d: larger than max %d inside toMarksWeirdNumbers()" % (theNumber, theMax),
+                "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
+            good = False
+        else:
+            converted = MarksWeirdDigits[0][firstint] + MarksWeirdDigits[1][secondint] + last3
+    return good, converted
+
 
 ###########################################################################
 ## Class DlgEnterVidNum
@@ -67,7 +155,11 @@ class DlgEnterVidNum ( wx.Dialog ):
 
     # Virtual event handlers, overide them in your derived class
     def onDlgBtnEnterVidNumApply( self, event ):
-        event.Skip()
+        nowTextCtrl2 = self.m_textCtrl2.GetValue() # MDO_Here
+        # see if this is a valid number; should be one of my weird numbers
+        good, ignore = fromMarksWeirdNumbers(nowTextCtrl2)
+        if good:
+            self.doLoadupNumMediaFile( mediaWeirdNum = nowTextCtrl2, statusText = "non-text-file %d" % nowTextCtrl2 )
 
     def onDlgBtnEnterVidNumCancel( self, event ):
         event.Skip()
@@ -99,18 +191,6 @@ class MainFrame ( wx.Frame ):
         self.m_textCtrlEntry_edited = ""
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
-
-        # for historical reasons numbering is
-        #   leftmost digit: _01...9A...Z
-        #   next     digit: 01...9A...Z
-        #   next 3  digits: 01...9
-        #   (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
-        self.MarksWeirdDigits = [ "_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            "0123456789",
-            "0123456789",
-            "0123456789"
-        ]
 
         bSizerFrame = wx.BoxSizer( wx.VERTICAL )
 
@@ -272,12 +352,12 @@ class MainFrame ( wx.Frame ):
 
 
     def onBtnPrev( self, event ):
-        ignore, mediaDecNum = self.fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
+        ignore, mediaDecNum = fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
         # print("fromMarksWeirdNumbers m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.m_mediaCurrentWeirdNum, ignore, mediaDecNum))
         if mediaDecNum > 1:
             mediaDecNum -= 1
         # print("decrement m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.m_mediaCurrentWeirdNum, ignore, mediaDecNum))
-        ignore, weirdMediaNum = self.toMarksWeirdNumbers(mediaDecNum)
+        ignore, weirdMediaNum = toMarksWeirdNumbers(mediaDecNum)
         # print("toMarksWeirdNumbers weirdMediaNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (weirdMediaNum, ignore, mediaDecNum))
         self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
 
@@ -298,11 +378,11 @@ class MainFrame ( wx.Frame ):
 
 
     def onBtnNext( self, event ):
-        ignore, mediaDecNum = self.fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
+        ignore, mediaDecNum = fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
         # FIXME Pix vs Movies
         if mediaDecNum < self.m_infoFile["THE_MAX_MVINUM"]:
             mediaDecNum += 1
-            ignore, weirdMediaNum = self.toMarksWeirdNumbers(mediaDecNum)
+            ignore, weirdMediaNum = toMarksWeirdNumbers(mediaDecNum)
             self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
 
 
@@ -354,10 +434,22 @@ class MainFrame ( wx.Frame ):
                break
             myX -= colWidth
         print("myRow=%d myCol=%d" % (myRow, myCol))
+        textNum = self.m_listCtrlVidComments.GetItemText(myRow,0)
+        textString = self.m_listCtrlVidComments.GetItemText(myRow,1)
+        # print("item=|%s| |%s|" % (textNum, textString))
+        good = False
+        if (len(textNum) >= 5):
+            good, ignore = fromMarksWeirdNumbers(textNum)
+        if good:
+            self.doLoadupNumMediaFile( mediaWeirdNum = textNum, statusText = "load %s" % textNum )
+        else:
+            good, ignore = fromMarksWeirdNumbers(textString[1:6])
+            if good:
+                self.doLoadupNumMediaFile(mediaWeirdNum=textString[1:6], statusText="alt-load %s" % textString[1:6])
 
     def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to onListCtrlActivated
         # adds line to list control before specified position
-        mediaFlag, ignore = self.fromMarksWeirdNumbers(line, quiet=True)
+        mediaFlag, ignore = fromMarksWeirdNumbers(line, quiet=True)
         if mediaFlag:
             # media line
             self.m_listCtrlVidComments.InsertItem(posn, line[:5])
@@ -463,7 +555,7 @@ class MainFrame ( wx.Frame ):
             self.m_infoFile = infoFile
             # let's just see if the info in infoFile is up to date, shall we?
             # FIXME Pix vs Movies
-            ignore, mediaWeirdNum = self.toMarksWeirdNumbers(infoFile["THE_MAX_MVINUM"])
+            ignore, mediaWeirdNum = toMarksWeirdNumbers(infoFile["THE_MAX_MVINUM"])
             mediaDirList = sorted(os.listdir((os.path.join(os.path.dirname(fname), 'movies', mediaWeirdNum[:2]))))
             mp4List = []
             for mDirFile in mediaDirList:
@@ -478,7 +570,7 @@ class MainFrame ( wx.Frame ):
                 # FIXME Pix vs Movies
                 wx.MessageBox("Warning: directory structure does not include \"%s\" media directory files per infoFile %s" % ("movie", fname), "ERROR", wx.ICON_ERROR | wx.OK)
             elif (found + 1) != len(mp4List):
-                ignore, decNum =  self.fromMarksWeirdNumbers(mp4List[-1][3:3+5], quiet=True)
+                ignore, decNum =  fromMarksWeirdNumbers(mp4List[-1][3:3+5], quiet=True)
                 wx.MessageBox("Warning: \"%s\" media directory files per infoFile %s\nExpected last file was %s (%d)\nActual last file in directory was %s (%d)" % ("movie", fname, expectedLastFile, infoFile["THE_MAX_MVINUM"], mp4List[-1], decNum), "ERROR", wx.ICON_ERROR | wx.OK)
         return retn
 
@@ -565,65 +657,6 @@ class MainFrame ( wx.Frame ):
             lineNum = self.m_listCtrlInfo[mediaWeirdNum]["line"][0]
         return lineNum
 
-
-
-    def fromMarksWeirdNumbers(self, theNumberText, quiet = False): # keep copying - this is in addition to OnFileOpen
-        # for historical reasons numbering is
-        # leftmost digit: _01...9A...Z
-        # next     digit: 01...9A...Z
-        # next 3  digits: 01...9
-        # (example: _0001 to _Z999 to 00000 to 99999 to 9A000 to 9Z999 to A0000 to ZZ999)
-
-        if type(theNumberText) != type('_A123'):
-            if False == quiet:
-                dlgRslt = wx.MessageBox("ERROR: cannot convert input type %s - inside fromMarksWeirdNumbers()" % (type(theNumberText)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
-            good = False
-        elif len(theNumberText) < 5:
-            if False == quiet:
-                dlgRslt = wx.MessageBox("ERROR: string |%s| is too short; must be >= 5 - inside fromMarksWeirdNumbers()" % (theNumberText), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
-            good = False
-        theNumberText = theNumberText.upper()
-        good = True
-        converted = 0
-        if len(theNumberText) < len(self.MarksWeirdDigits):
-            good = False
-            converted = -1
-        if good:
-            for idx in range(len(self.MarksWeirdDigits)):
-                converted *= len(self.MarksWeirdDigits[idx])
-                tmp = self.MarksWeirdDigits[idx].find(theNumberText[idx])
-                if -1 != tmp:
-                    converted += tmp
-                else:
-                    good = False
-                    converted = -1
-                    break
-        return good, converted
-
-    def toMarksWeirdNumbers(self, theNumber, quiet = False): # keep copying - this is in addition to OnFileOpen
-        # see fromMarksWeirdNumbers() for description of strange numbering scheme
-        good = True
-        converted = "_0000" # zero
-        if type(theNumber) == type("123"): # if it is a string
-            theNumber = int(theNumber)
-        if type(theNumber) != type(123):
-            if False == quiet:
-                dlgRslt = wx.MessageBox("ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
-            good = False
-        else:
-            # FIXME let's cheat a little; we know some things about this...
-            last3 = "%03d" % (theNumber % 1000)
-            first2int = int(theNumber // 1000)
-            firstint = int(first2int // len(self.MarksWeirdDigits[1]))
-            secondint = first2int - firstint*len(self.MarksWeirdDigits[1])
-            if firstint > len(self.MarksWeirdDigits[0]):
-                theMax = ((len(self.MarksWeirdDigits[0])-1) * len(self.MarksWeirdDigits[1]) + (len(self.MarksWeirdDigits[1])-1))*1000 + 999
-                dlgRslt = wx.MessageBox("ERROR: cannot convert %d: larger than max %d inside toMarksWeirdNumbers()" % (theNumber, theMax), "Bad Inputs", wx.ICON_EXCLAMATION|wx.CENTRE)
-                good = False
-            else:
-                converted = self.MarksWeirdDigits[0][firstint] + self.MarksWeirdDigits[1][secondint] + last3
-        return good, converted
-
     def doFindDirecTextFileUsableLine(self, direc): # keep copying - this is in addition to OnFileOpen
         """finds m_txtFileLines Usable Line idx in direction direc or -1"""
         foundit = -1
@@ -633,7 +666,7 @@ class MainFrame ( wx.Frame ):
             idx += direc
             if (idx < 0) or (idx >= len(self.m_txtFileLines)):
                 break
-            good, ignore = self.fromMarksWeirdNumbers(self.m_txtFileLines[idx], quiet=True)
+            good, ignore = fromMarksWeirdNumbers(self.m_txtFileLines[idx], quiet=True)
             if good != True:
                 continue
             else:

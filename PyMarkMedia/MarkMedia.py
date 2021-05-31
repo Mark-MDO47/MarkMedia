@@ -113,6 +113,9 @@ class DlgEnterVidNum ( wx.Dialog ):
     def __init__( self, parent ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 474,187 ), style = wx.DEFAULT_DIALOG_STYLE )
 
+        self.ReturnNumberWeird = "UNKNOWN"
+        self.ReturnNumberDec = -1
+
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         bSizer4 = wx.BoxSizer( wx.VERTICAL )
@@ -148,21 +151,34 @@ class DlgEnterVidNum ( wx.Dialog ):
         # Connect Events
         self.m_sdbSizer1Apply.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumApply )
         self.m_sdbSizer1Cancel.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumCancel )
+    # end class DlgEnterVidNum().__init__()
 
     def __del__( self ):
         pass
-
+    # end class DlgEnterVidNum().__del__()
 
     # Virtual event handlers, overide them in your derived class
     def onDlgBtnEnterVidNumApply( self, event ):
         nowTextCtrl2 = self.m_textCtrl2.GetValue() # MDO_Here
         # see if this is a valid number; should be one of my weird numbers
-        good, ignore = fromMarksWeirdNumbers(nowTextCtrl2)
+        good, retnumberdec = fromMarksWeirdNumbers(nowTextCtrl2)
         if good:
-            self.doLoadupNumMediaFile( mediaWeirdNum = nowTextCtrl2, statusText = "non-text-file %d" % nowTextCtrl2 )
+            self.ReturnNumberWeird = nowTextCtrl2
+            self.ReturnNumberDec = retnumberdec
+            self.Destroy()
+        else:
+            message = wx.MessageDialog(self, _("%s is not a valid weird number" % nowTextCtrl2),
+                                       _("ERROR"), wx.OK | wx.ICON_ERROR)
+            message.ShowModal()
+            message.Destroy()
+    # end class DlgEnterVidNum().onDlgBtnEnterVidNumApply()
 
     def onDlgBtnEnterVidNumCancel( self, event ):
-        event.Skip()
+        self.ReturnNumberWeird = "UNKNOWN"
+        self.Destroy()
+    # end class DlgEnterVidNum().onDlgBtnEnterVidNumCancel()
+
+    # end class DlgEnterVidNum()
 
 
 
@@ -395,9 +411,11 @@ class MainFrame ( wx.Frame ):
 
 
     def onBtnEnterVidNum( self, event ):
-        DlgEnterVidNum(self).ShowModal()
-
-
+        tmp = DlgEnterVidNum(self)
+        tmp.ShowModal()
+        if "UNKNOWN" != tmp.ReturnNumberWeird:
+            self.doLoadupNumMediaFile(mediaWeirdNum=tmp.ReturnNumberWeird,
+                                      statusText="non-text-file %d" % tmp.ReturnNumberDec)
 
     def onBtnLouder( self, event ):
         # increase volume by 5 percent; makes assumption that current volume is valid

@@ -353,10 +353,12 @@ class MainFrame ( wx.Frame ):
         self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemeExit.GetId() )
         self.Bind( wx.EVT_MENU, self.onHelpAbout, id = self.m_menuItemHelpAbout.GetId() )
         self.Bind( wx.EVT_TIMER, self.onTimerMedia, id=wx.ID_ANY )
+    # end class MainFrame().__init__()
 
     def __del__( self ):
         del self.m_mediactrl
         pass
+    # end class MainFrame().__del__()
 
 
     # Virtual event handlers, overide them in your derived class
@@ -365,7 +367,7 @@ class MainFrame ( wx.Frame ):
         if possibleIdx >= 0:
             self.m_txtFileIdx = possibleIdx
             ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
-
+    # end class MainFrame().onBtnPrevFile()
 
     def onBtnPrev( self, event ):
         ignore, mediaDecNum = fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
@@ -376,8 +378,7 @@ class MainFrame ( wx.Frame ):
         ignore, weirdMediaNum = toMarksWeirdNumbers(mediaDecNum)
         # print("toMarksWeirdNumbers weirdMediaNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (weirdMediaNum, ignore, mediaDecNum))
         self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
-
-
+    # end class MainFrame().onBtnPrev()
 
     def onBtnPlay( self, event ):
         if not self.m_mediactrl.Play():
@@ -386,11 +387,11 @@ class MainFrame ( wx.Frame ):
         else:
             self.m_mediactrl.SetInitialSize()
             self.GetSizer().Layout()
-
-
+    # end class MainFrame().onBtnPlay()
 
     def onBtnPause( self, event ):
         self.m_mediactrl.Pause()
+    # end class MainFrame().onBtnPause()
 
 
     def onBtnNext( self, event ):
@@ -400,6 +401,7 @@ class MainFrame ( wx.Frame ):
             mediaDecNum += 1
             ignore, weirdMediaNum = toMarksWeirdNumbers(mediaDecNum)
             self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
+    # end class MainFrame().onBtnNext()
 
 
 
@@ -408,6 +410,7 @@ class MainFrame ( wx.Frame ):
         if possibleIdx >= 0:
             self.m_txtFileIdx = possibleIdx
             ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+    # end class MainFrame().onBtnNextFile()
 
 
     def onBtnEnterVidNum( self, event ):
@@ -416,21 +419,21 @@ class MainFrame ( wx.Frame ):
         if "UNKNOWN" != tmp.ReturnNumberWeird:
             self.doLoadupNumMediaFile(mediaWeirdNum=tmp.ReturnNumberWeird,
                                       statusText="non-text-file %d" % tmp.ReturnNumberDec)
+    # end class MainFrame().onBtnEnterVidNum()
 
     def onBtnLouder( self, event ):
         # increase volume by 5 percent; makes assumption that current volume is valid
                 self.m_mediactrl.SetVolume(min(1.0, self.m_mediactrl.GetVolume()+0.05))
-
-
+    # end class MainFrame().onBtnLouder()
 
     def onBtnSofter( self, event ):
         # decrease volume by 5 percent; makes assumption that current volume is valid
                 self.m_mediactrl.SetVolume(max(0.0, self.m_mediactrl.GetVolume()-0.05))
-
-
+    # end class MainFrame().onBtnSofter()
 
     def onTextCtrlEntry( self, event ):
-        event.Skip()
+        event.Skip() # TODO need to write this one
+    # end class MainFrame().onTextCtrlEntry()
 
     def onListCtrlActivated( self, event ):
         # print("OnItemActivated: %s - %s    TopItem: %s" % (event.Index, self.m_listCtrlVidComments.GetItemText(event.Index), self.m_listCtrlVidComments.GetTopItem()))
@@ -464,6 +467,7 @@ class MainFrame ( wx.Frame ):
             good, ignore = fromMarksWeirdNumbers(textString[1:6])
             if good:
                 self.doLoadupNumMediaFile(mediaWeirdNum=textString[1:6], statusText="alt-load %s" % textString[1:6])
+    # end class MainFrame().onListCtrlActivated()
 
     def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to onListCtrlActivated
         # adds line to list control before specified position
@@ -489,7 +493,7 @@ class MainFrame ( wx.Frame ):
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")
         else:
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "yellow")
-
+    # end class MainFrame().doAddListCtrlLine()
 
     def OnFileOpen( self, event ):
         # FIXME Pix vs Movies
@@ -514,6 +518,7 @@ class MainFrame ( wx.Frame ):
                     loadOK = False
             if loadOK:
                 loadOK = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+    # end class MainFrame().OnFileOpen()
 
     def doGetTxtFileLines(self, fname): # keep copying - this is in addition to OnFileOpen
         """Opens text file and reads the lines"""
@@ -548,6 +553,7 @@ class MainFrame ( wx.Frame ):
             retn = "ERROR: %s has no lines" % fname
             theLines = []
         return retn, theLines
+    # end class MainFrame()doGetTxtFileLines()
 
     def doLoadInfoFile(self, fname): # keep copying - this is in addition to OnFileOpen
         """gets last filenum for MVI and IMG"""
@@ -591,6 +597,7 @@ class MainFrame ( wx.Frame ):
                 ignore, decNum =  fromMarksWeirdNumbers(mp4List[-1][3:3+5], quiet=True)
                 wx.MessageBox("Warning: \"%s\" media directory files per infoFile %s\nExpected last file was %s (%d)\nActual last file in directory was %s (%d)" % ("movie", fname, expectedLastFile, infoFile["THE_MAX_MVINUM"], mp4List[-1], decNum), "ERROR", wx.ICON_ERROR | wx.OK)
         return retn
+    # end class MainFrame().doLoadInfoFile()
 
     def doLoadTextFile(self, fname): # keep copying - this is in addition to OnFileOpen
         """Opens text file"""
@@ -613,6 +620,7 @@ class MainFrame ( wx.Frame ):
             retn = "ERROR: file %s has no non-comment lines" % fname
         self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
         return retn
+    # end class MainFrame().doLoadTextFile()
 
     def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
         loadOK = True
@@ -667,6 +675,7 @@ class MainFrame ( wx.Frame ):
 
         self.m_textCtrlEntry_unchanged = ""
         self.m_textCtrlEntry_edited = ""
+    # end class MainFrame().doLoadupNumMediaFile()
 
     def getListCtrlLine(self, mediaWeirdNum): # keep copying - this is in addition to OnFileOpen
         lineNum = -1
@@ -674,6 +683,7 @@ class MainFrame ( wx.Frame ):
         if mediaWeirdNum in self.m_listCtrlInfo.keys():
             lineNum = self.m_listCtrlInfo[mediaWeirdNum]["line"][0]
         return lineNum
+    # end class MainFrame().getListCtrlLine()
 
     def doFindDirecTextFileUsableLine(self, direc): # keep copying - this is in addition to OnFileOpen
         """finds m_txtFileLines Usable Line idx in direction direc or -1"""
@@ -691,32 +701,31 @@ class MainFrame ( wx.Frame ):
                 foundit = idx
                 break
         return foundit
-
+    # end class MainFrame().doFindDirecTextFileUsableLine()
 
     def onFileSave( self, event ):
-        event.Skip()            # need to write this one
-
+        event.Skip()            # TODO need to write this one
+    # end class MainFrame().onFileSave()
 
     def onFileSaveAs( self, event ):
-        event.Skip()            # need to write this one
-
-
+        event.Skip()            # TODO need to write this one
+    # end class MainFrame().onFileSaveAs()
 
     def OnFileQuit( self, event ):
         dlgRslt = wx.MessageBox("Are you sure? This will lose changes", "Are you sure?", wx.YES|wx.NO|wx.CANCEL|wx.ICON_EXCLAMATION|wx.CENTRE)
         if wx.NO == dlgRslt:
-            event.Skip()
+            event.Skip() # OK; just keep going
         else:
             self.Close()
-
+    # end class MainFrame().OnFileQuit()
 
     def OnFileExit( self, event ):
-        event.Skip()            # need to write this one
-
+        event.Skip()            # TODO need to write this one
+    # end class MainFrame().OnFileExit()
 
     def onHelpAbout( self, event ):
-        event.Skip()            # need to write this one
-
+        event.Skip()            # TODO need to write this one
+    # end class MainFrame().onHelpAbout()
 
     def onTimerMedia( self, event ):
         # the length is -1 if nothing is loaded
@@ -737,6 +746,7 @@ class MainFrame ( wx.Frame ):
                     sleep(0.05) # sleep seconds
                     self.m_mediactrl.Pause()
                     self.m_mediaStartStopDisplay = False
+    # end class MainFrame().onTimerMedia()
 
 
 

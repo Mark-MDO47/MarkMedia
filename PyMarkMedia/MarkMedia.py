@@ -9,7 +9,7 @@
 ###########################################################################
 
 
-import sys
+# import sys
 import os
 import time
 from time import sleep
@@ -44,17 +44,15 @@ MarksWeirdDigits = ["_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 
 def fromMarksWeirdNumbers(theNumberText, quiet=False):  # keep copying - this is in addition to OnFileOpen
     if type(theNumberText) != type('_A123'):
-        if False == quiet:
-            dlgRslt = wx.MessageBox(
+        if quiet is False:
+            ignore = wx.MessageBox(
                 "ERROR: cannot convert input type %s - inside fromMarksWeirdNumbers()" % (type(theNumberText)),
                 "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
-        good = False
     elif len(theNumberText) < 5:
-        if False == quiet:
-            dlgRslt = wx.MessageBox(
+        if quiet is False:
+            ignore = wx.MessageBox(
                 "ERROR: string |%s| is too short; must be >= 5 - inside fromMarksWeirdNumbers()" % (theNumberText),
                 "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
-        good = False
     theNumberText = theNumberText.upper()
     good = True
     converted = 0
@@ -81,8 +79,8 @@ def toMarksWeirdNumbers(theNumber, quiet=False):  # keep copying - this is in ad
     if type(theNumber) == type("123"):  # if it is a string
         theNumber = int(theNumber)
     if type(theNumber) != type(123):
-        if False == quiet:
-            dlgRslt = wx.MessageBox(
+        if quiet is False:
+            ignore = wx.MessageBox(
                 "ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)),
                 "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
         good = False
@@ -95,7 +93,7 @@ def toMarksWeirdNumbers(theNumber, quiet=False):  # keep copying - this is in ad
         if firstint > len(MarksWeirdDigits[0]):
             theMax = ((len(MarksWeirdDigits[0]) - 1) * len(MarksWeirdDigits[1]) + (
                         len(MarksWeirdDigits[1]) - 1)) * 1000 + 999
-            dlgRslt = wx.MessageBox(
+            ignore = wx.MessageBox(
                 "ERROR: cannot convert %d: larger than max %d inside toMarksWeirdNumbers()" % (theNumber, theMax),
                 "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
             good = False
@@ -111,7 +109,8 @@ def toMarksWeirdNumbers(theNumber, quiet=False):  # keep copying - this is in ad
 class DlgEnterVidNum ( wx.Dialog ):
 
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 474,187 ), style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition,
+                             size = wx.Size( 474,187 ), style = wx.DEFAULT_DIALOG_STYLE )
 
         self.ReturnNumberWeird = "UNKNOWN"
         self.ReturnNumberDec = -1
@@ -120,7 +119,10 @@ class DlgEnterVidNum ( wx.Dialog ):
 
         bSizer4 = wx.BoxSizer( wx.VERTICAL )
 
-        self.m_staticTextDlgEnterVidNum = wx.StaticText( self, wx.ID_ANY, _(u"Enter last 5 digits below. Example:  for IMG_P085 enter _P085, for MVI0C123 enter 0C123"), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+        self.m_staticTextDlgEnterVidNum =\
+            wx.StaticText( self, wx.ID_ANY,
+                           _(u"Enter last 5 digits below. Example:  for IMG_P085 enter _P085, for MVI0C123 enter 0C123"),
+                           wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
         self.m_staticTextDlgEnterVidNum.Wrap( -1 )
 
         bSizer4.Add( self.m_staticTextDlgEnterVidNum, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -128,7 +130,9 @@ class DlgEnterVidNum ( wx.Dialog ):
         self.m_textCtrl2 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer4.Add( self.m_textCtrl2, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
-        self.m_staticTextDlgEnterVidNumStatus = wx.StaticText( self, wx.ID_ANY, _(u"Status: waiting for entry..."), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+        self.m_staticTextDlgEnterVidNumStatus =\
+            wx.StaticText( self, wx.ID_ANY, _(u"Status: waiting for entry..."),
+                           wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
         self.m_staticTextDlgEnterVidNumStatus.Wrap( -1 )
 
         bSizer4.Add( self.m_staticTextDlgEnterVidNumStatus, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -138,7 +142,7 @@ class DlgEnterVidNum ( wx.Dialog ):
         m_sdbSizer1.AddButton( self.m_sdbSizer1Apply )
         self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
         m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
-        m_sdbSizer1.Realize();
+        m_sdbSizer1.Realize()
 
         bSizer4.Add( m_sdbSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
@@ -188,7 +192,8 @@ class DlgEnterVidNum ( wx.Dialog ):
 
 class MainFrame ( wx.Frame ):
     def __init__( self, parent, absRunPath = "" ):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 1245,1193 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition,
+                            size = wx.Size( 1245,1193 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
         # inserted by aftercopyfilefrom to be copied after "wx.Frame.__init__"
         self.m_absRunPath = absRunPath # absolute path we were run from
@@ -202,9 +207,10 @@ class MainFrame ( wx.Frame ):
         self.m_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
         self.m_infoFile = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
         self.m_listCtrlInfo = {} # [validWeirdNum] = {"line": -1} , others TBD
-        self.m_listCtrlSlctd = {"prev": -1, "curr": -1}
+        self.m_listCtrlSlctd = {"prev": "_0001", "curr": "_0001"}
         self.m_textCtrlEntry_unchanged = ""
         self.m_textCtrlEntry_edited = ""
+        self.mdoMediaCtrls = True # ShowPlayerControls does not seem to work
         
         self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
@@ -215,18 +221,21 @@ class MainFrame ( wx.Frame ):
 
         bSizerPanel = wx.BoxSizer( wx.VERTICAL )
 
-        self.m_staticTextStatus = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Status: ...", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticTextStatus = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Status: ...",
+                                                 wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticTextStatus.Wrap( -1 )
 
         self.m_staticTextStatus.SetToolTip( u"Status is displayed here" )
 
         bSizerPanel.Add( self.m_staticTextStatus, 0, wx.ALL|wx.EXPAND, 5 )
         self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))
+        if not self.mdoMediaCtrls:
+            self.m_mediactrl.ShowPlayerControls(flags=wx.media.MEDIACTRLPLAYERCONTROLS_DEFAULT) # does not seem to work
         bSizerPanel.Add( self.m_mediactrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 
-        self.m_buttonPrevfile = wx.Button( self.m_panel1, wx.ID_ANY, u"|<textfile", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_buttonPrevfile = wx.Button(self.m_panel1, wx.ID_ANY, u"|<textfile", wx.DefaultPosition, wx.DefaultSize, 0)
         self.m_buttonPrevfile.SetToolTip( u"Previous in text file" )
 
         bSizer3.Add( self.m_buttonPrevfile, 0, wx.ALL, 5 )
@@ -236,15 +245,16 @@ class MainFrame ( wx.Frame ):
 
         bSizer3.Add( self.m_buttonPrev, 0, wx.ALL, 5 )
 
-        self.m_buttonPlay = wx.Button( self.m_panel1, wx.ID_ANY, u">", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_buttonPlay.SetToolTip( u"Play" )
+        if self.mdoMediaCtrls:
+            self.m_buttonPlay = wx.Button( self.m_panel1, wx.ID_ANY, u">", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_buttonPlay.SetToolTip( u"Play" )
 
-        bSizer3.Add( self.m_buttonPlay, 0, wx.ALL, 5 )
+            bSizer3.Add( self.m_buttonPlay, 0, wx.ALL, 5 )
 
-        self.m_buttonPause = wx.Button( self.m_panel1, wx.ID_ANY, u">][<", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_buttonPause.SetToolTip( u"Pause" )
+            self.m_buttonPause = wx.Button( self.m_panel1, wx.ID_ANY, u">][<", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_buttonPause.SetToolTip( u"Pause" )
 
-        bSizer3.Add( self.m_buttonPause, 0, wx.ALL, 5 )
+            bSizer3.Add( self.m_buttonPause, 0, wx.ALL, 5 )
 
         self.m_buttonNext = wx.Button( self.m_panel1, wx.ID_ANY, u">|", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_buttonNext.SetToolTip( u"Next media file" )
@@ -274,12 +284,14 @@ class MainFrame ( wx.Frame ):
 
         bSizerPanel.Add( bSizer3, 0, wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
-        self.m_textCtrlEntry = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_NOHIDESEL|wx.TE_NO_VSCROLL|wx.TE_PROCESS_ENTER )
+        self.m_textCtrlEntry = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
+                                            wx.DefaultSize, wx.TE_NOHIDESEL|wx.TE_NO_VSCROLL|wx.TE_PROCESS_ENTER )
         self.m_textCtrlEntry.SetToolTip( u"Enter/Edit Comment" )
 
         bSizerPanel.Add( self.m_textCtrlEntry, 0, wx.ALL|wx.EXPAND, 5 )
 
-        self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LC_REPORT|wx.BORDER_SUNKEN )
+        self.m_listCtrlVidComments = wx.ListCtrl( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ),
+                                                  wx.LC_REPORT|wx.BORDER_SUNKEN )
         self.m_listCtrlVidComments.SetToolTip( u"List of existing Video txt comments" )
         self.m_listCtrlVidComments.SetMinSize( wx.Size( -1,300 ) )
 # start copying here
@@ -302,25 +314,31 @@ class MainFrame ( wx.Frame ):
         self.Layout()
         self.m_menubarMainFrame = wx.MenuBar( 0 )
         self.m_menuFile = wx.Menu()
-        self.m_menuItemFileOpen = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Open Video txt...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItemFileOpen = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Open Video txt...",
+                                               wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuFile.Append( self.m_menuItemFileOpen )
 
-        self.m_menuItemFileSave = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Save Video txt...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItemFileSave = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Save Video txt...",
+                                               wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuFile.Append( self.m_menuItemFileSave )
 
-        self.m_menuItemFileSaveAs = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Save As Video txt...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItemFileSaveAs = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Save As Video txt..."
+                                                 , wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuFile.Append( self.m_menuItemFileSaveAs )
 
-        self.m_menuItemQuit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Quit without save...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItemQuit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Quit without save...",
+                                           wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuFile.Append( self.m_menuItemQuit )
 
-        self.m_menuItemeExit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Exit and save", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItemeExit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Exit and save",
+                                            wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuFile.Append( self.m_menuItemeExit )
 
         self.m_menubarMainFrame.Append( self.m_menuFile, u"File" )
 
         self.m_menuHelp = wx.Menu()
-        self.m_menuItemHelpAbout = wx.MenuItem( self.m_menuHelp, wx.ID_ANY, u"About...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItemHelpAbout = wx.MenuItem( self.m_menuHelp, wx.ID_ANY, u"About...",
+                                                wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuHelp.Append( self.m_menuItemHelpAbout )
 
         self.m_menubarMainFrame.Append( self.m_menuHelp, u"Help" )
@@ -337,8 +355,9 @@ class MainFrame ( wx.Frame ):
         # Connect Events
         self.m_buttonPrevfile.Bind( wx.EVT_BUTTON, self.onBtnPrevFile )
         self.m_buttonPrev.Bind( wx.EVT_BUTTON, self.onBtnPrev )
-        self.m_buttonPlay.Bind( wx.EVT_BUTTON, self.onBtnPlay )
-        self.m_buttonPause.Bind( wx.EVT_BUTTON, self.onBtnPause )
+        if self.mdoMediaCtrls:
+            self.m_buttonPlay.Bind( wx.EVT_BUTTON, self.onBtnPlay )
+            self.m_buttonPause.Bind( wx.EVT_BUTTON, self.onBtnPause )
         self.m_buttonNext.Bind( wx.EVT_BUTTON, self.onBtnNext )
         self.m_buttonNextFile.Bind( wx.EVT_BUTTON, self.onBtnNextFile )
         self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
@@ -366,7 +385,8 @@ class MainFrame ( wx.Frame ):
         possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
         if possibleIdx >= 0:
             self.m_txtFileIdx = possibleIdx
-            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5],
+                                                statusText= self.m_txtFileLines[self.m_txtFileIdx] )
     # end class MainFrame().onBtnPrevFile()
 
     def onBtnPrev( self, event ):
@@ -409,7 +429,8 @@ class MainFrame ( wx.Frame ):
         possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
         if possibleIdx >= 0:
             self.m_txtFileIdx = possibleIdx
-            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5],
+                                                statusText= self.m_txtFileLines[self.m_txtFileIdx] )
     # end class MainFrame().onBtnNextFile()
 
 
@@ -497,14 +518,17 @@ class MainFrame ( wx.Frame ):
 
     def OnFileOpen( self, event ):
         # FIXME Pix vs Movies
-        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file in complete Olson www folder", defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file in complete Olson www folder",
+                            defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt",
+                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
             loadOK = True
             pathTxt = os.path.abspath(dlg.GetPath())
             pathRootDir = os.path.dirname(pathTxt)
             pathPictureInfo = os.path.join(pathRootDir, "OlsonPictureInfo.php")
             if False == os.path.exists(pathPictureInfo):
-                wx.MessageBox("Unable to load required Info file %s: file does not exist" % pathPictureInfo, "ERROR", wx.ICON_ERROR | wx.OK)
+                wx.MessageBox("Unable to load required Info file %s: file does not exist" % pathPictureInfo,
+                              "ERROR", wx.ICON_ERROR | wx.OK)
                 loadOK = False
             if loadOK:
                 retn = self.doLoadInfoFile(pathPictureInfo)
@@ -517,7 +541,8 @@ class MainFrame ( wx.Frame ):
                     wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
                     loadOK = False
             if loadOK:
-                loadOK = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5], statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+                loadOK = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5],
+                                                    statusText= self.m_txtFileLines[self.m_txtFileIdx] )
     # end class MainFrame().OnFileOpen()
 
     def doGetTxtFileLines(self, fname): # keep copying - this is in addition to OnFileOpen
@@ -585,7 +610,7 @@ class MainFrame ( wx.Frame ):
             for mDirFile in mediaDirList:
                 if mDirFile.endswith(".MP4"):
                    mp4List.append(mDirFile)
-            # FIXME Pix vs Movies
+            # FIXME Pix vs Movies TODO
             expectedLastFile = "MVI"+mediaWeirdNum+".MP4"
             found = -1
             if expectedLastFile in mp4List:
@@ -673,8 +698,6 @@ class MainFrame ( wx.Frame ):
                 pass
         return loadOK
 
-        self.m_textCtrlEntry_unchanged = ""
-        self.m_textCtrlEntry_edited = ""
     # end class MainFrame().doLoadupNumMediaFile()
 
     def getListCtrlLine(self, mediaWeirdNum): # keep copying - this is in addition to OnFileOpen
@@ -712,7 +735,8 @@ class MainFrame ( wx.Frame ):
     # end class MainFrame().onFileSaveAs()
 
     def OnFileQuit( self, event ):
-        dlgRslt = wx.MessageBox("Are you sure? This will lose changes", "Are you sure?", wx.YES|wx.NO|wx.CANCEL|wx.ICON_EXCLAMATION|wx.CENTRE)
+        dlgRslt = wx.MessageBox("Are you sure? This will lose changes", "Are you sure?",
+                                wx.YES|wx.NO|wx.CANCEL|wx.ICON_EXCLAMATION|wx.CENTRE)
         if wx.NO == dlgRslt:
             event.Skip() # OK; just keep going
         else:

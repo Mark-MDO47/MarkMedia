@@ -42,7 +42,7 @@ MarksWeirdDigits = ["_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                    ]
 
 
-def fromMarksWeirdNumbers(theNumberText, quiet=False):  # keep copying - this is in addition to OnFileOpen
+def fromMarksWeirdNumbers(theNumberText, quiet=False):
     if type(theNumberText) != type('_A123'):
         if quiet is False:
             ignore = wx.MessageBox(
@@ -72,7 +72,7 @@ def fromMarksWeirdNumbers(theNumberText, quiet=False):  # keep copying - this is
     return good, converted
 
 
-def toMarksWeirdNumbers(theNumber, quiet=False):  # keep copying - this is in addition to OnFileOpen
+def toMarksWeirdNumbers(theNumber, quiet=False):
     # see MarksWeirdDigits[] for description of strange numbering scheme
     good = True
     converted = "_0000"  # zero
@@ -200,6 +200,7 @@ class MainFrame ( wx.Frame ):
         self.m_txtFilePath = "UNKNOWN" # absolute path to open text file
         self.m_txtFileLines = []       # lines for open text file, stripped
         self.m_txtFileIdx = -1         # which line for open text file or -1
+        self.m_txtFileModified = False # will be true when modifications are made
         self.m_mediaLength = None # the length of media file; appears to be in milliseconds
         self.m_mediaLoad = False  # True when media load done until timer processes it
         self.m_mediaStartStopDisplay = False # yet another media load flag
@@ -476,6 +477,7 @@ class MainFrame ( wx.Frame ):
                break
             myX -= colWidth
         print("myRow=%d myCol=%d" % (myRow, myCol))
+        numCols = self.m_listCtrlVidComments.GetColumnCount()  # actually I know there are just two
         textNum = self.m_listCtrlVidComments.GetItemText(myRow,0)
         textString = self.m_listCtrlVidComments.GetItemText(myRow,1)
         # print("item=|%s| |%s|" % (textNum, textString))
@@ -490,8 +492,8 @@ class MainFrame ( wx.Frame ):
                 self.doLoadupNumMediaFile(mediaWeirdNum=textString[1:6], statusText="alt-load %s" % textString[1:6])
     # end class MainFrame().onListCtrlActivated()
 
-    def doAddListCtrlLine( self, line = "", posn = 0 ): # keep copying - this is in addition to onListCtrlActivated
-        # adds line to list control before specified position
+    def doAddListCtrlLine( self, line = "", posn = 0 ):
+        # adds line to list control  before specified position
         mediaFlag, ignore = fromMarksWeirdNumbers(line, quiet=True)
         if mediaFlag:
             # media line
@@ -545,7 +547,7 @@ class MainFrame ( wx.Frame ):
                                                     statusText= self.m_txtFileLines[self.m_txtFileIdx] )
     # end class MainFrame().OnFileOpen()
 
-    def doGetTxtFileLines(self, fname): # keep copying - this is in addition to OnFileOpen
+    def doGetTxtFileLines(self, fname):
         """Opens text file and reads the lines"""
         retn = "OK"
         absName = "UNKNOWN"
@@ -580,7 +582,7 @@ class MainFrame ( wx.Frame ):
         return retn, theLines
     # end class MainFrame()doGetTxtFileLines()
 
-    def doLoadInfoFile(self, fname): # keep copying - this is in addition to OnFileOpen
+    def doLoadInfoFile(self, fname):
         """gets last filenum for MVI and IMG"""
         # should contain lines that look like this:
         # define("THE_MAX_IMGNUM","45065");
@@ -624,7 +626,7 @@ class MainFrame ( wx.Frame ):
         return retn
     # end class MainFrame().doLoadInfoFile()
 
-    def doLoadTextFile(self, fname): # keep copying - this is in addition to OnFileOpen
+    def doLoadTextFile(self, fname):
         """Opens text file"""
         self.m_txtFileIdx = -1
         retn, self.m_txtFileLines = self.doGetTxtFileLines( fname )
@@ -647,7 +649,7 @@ class MainFrame ( wx.Frame ):
         return retn
     # end class MainFrame().doLoadTextFile()
 
-    def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ): # keep copying - this is in addition to OnFileOpen
+    def doLoadupNumMediaFile( self, mediaWeirdNum = "_0001", statusText = "Status: ..." ):
         loadOK = True
         nowStatus = self.m_staticTextStatus.GetLabel()
         nowTextCtrlEntry = self.m_textCtrlEntry.GetValue()
@@ -697,10 +699,9 @@ class MainFrame ( wx.Frame ):
                 self.m_textCtrlEntry.ChangeValue("") # avoid generating wxEVT_TEXT with SetValue
                 pass
         return loadOK
-
     # end class MainFrame().doLoadupNumMediaFile()
 
-    def getListCtrlLine(self, mediaWeirdNum): # keep copying - this is in addition to OnFileOpen
+    def getListCtrlLine(self, mediaWeirdNum):
         lineNum = -1
         # FIXME make it choose the same one the user clicked if more than one of same in listctrl
         if mediaWeirdNum in self.m_listCtrlInfo.keys():
@@ -708,7 +709,7 @@ class MainFrame ( wx.Frame ):
         return lineNum
     # end class MainFrame().getListCtrlLine()
 
-    def doFindDirecTextFileUsableLine(self, direc): # keep copying - this is in addition to OnFileOpen
+    def doFindDirecTextFileUsableLine(self, direc):
         """finds m_txtFileLines Usable Line idx in direction direc or -1"""
         foundit = -1
         good = False
@@ -731,7 +732,34 @@ class MainFrame ( wx.Frame ):
     # end class MainFrame().onFileSave()
 
     def onFileSaveAs( self, event ):
-        event.Skip()            # TODO need to write this one
+        dlg = fPtr = None
+        try:
+            dlg = wx.FileDialog(self, "Save to file:", ".", "", "Text (*.txt)|*.txt", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+            if (dlg.ShowModal() == wx.ID_OK):
+                self.filename = dlg.GetFilename()
+                self.dirname = dlg.GetDirectory()
+                fPtr = open(os.path.join(self.dirname, self.filename), 'wt')
+                for myLnum in range(self.m_listCtrlVidComments.GetItemCount()):
+                    textNum = self.m_listCtrlVidComments.GetItemText(myLnum, 0)
+                    textString = self.m_listCtrlVidComments.GetItemText(myLnum, 1)
+                    mediaFlag, ignore = fromMarksWeirdNumbers(textNum, quiet=True)
+                    if mediaFlag:
+                        fPtr.write("%s %s\n" % (textNum, textString))
+                    else:
+                        fPtr.write("%s\n" % (textString))
+                fPtr.close()
+                fPtr = None
+            dlg.Destroy()
+            dlg = None
+        except:
+            message = wx.MessageDialog(self, _("Could not save file; file not saved. Try again."),
+                                       _("ERROR"), wx.OK | wx.ICON_ERROR)
+            message.ShowModal()
+            message.Destroy()
+            if dlg is not None:
+                dlg.Destroy()
+            if fPtr is not None:
+                f.close()
     # end class MainFrame().onFileSaveAs()
 
     def OnFileQuit( self, event ):
@@ -750,6 +778,14 @@ class MainFrame ( wx.Frame ):
     def onHelpAbout( self, event ):
         event.Skip()            # TODO need to write this one
     # end class MainFrame().onHelpAbout()
+
+    """FIXME TODO start/stop movie on click in movie window
+    def onMouseUpLeftUp( self, event): # if click in movie window, toggle play-stop for movie
+        myX, myY = self.self.m_mediactrl.ScreenToClient(wx.GetMousePosition())
+        print("myX=%d, myY=%d" % (myX, myY))
+        event.Skip()            # TODO need to write this one
+    # end class MainFrame().onMouseUpLeftUp()
+    """
 
     def onTimerMedia( self, event ):
         # the length is -1 if nothing is loaded

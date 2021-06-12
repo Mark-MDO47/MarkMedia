@@ -85,7 +85,7 @@ def toMarksWeirdNumbers(theNumber, quiet=False):
                 "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
         good = False
     else:
-        # FIXME let's cheat a little; we know some things about this...
+        # TODO FIXME let's cheat a little; we know some things about this...
         last3 = "%03d" % (theNumber % 1000)
         first2int = int(theNumber // 1000)
         firstint = int(first2int // len(MarksWeirdDigits[1]))
@@ -137,11 +137,12 @@ class DlgEnterVidNum ( wx.Dialog ):
 
         bSizer4.Add( self.m_staticTextDlgEnterVidNumStatus, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
+        # m_sdbtn_ is standard dialog button
         m_sdbSizer1 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer1Apply = wx.Button( self, wx.ID_APPLY )
-        m_sdbSizer1.AddButton( self.m_sdbSizer1Apply )
-        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
-        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        self.m_sdbtn_Sizer1Apply = wx.Button( self, wx.ID_APPLY )
+        m_sdbSizer1.AddButton( self.m_sdbtn_Sizer1Apply )
+        self.m_sdbtn_Sizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbtn_Sizer1Cancel )
         m_sdbSizer1.Realize()
 
         bSizer4.Add( m_sdbSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -153,8 +154,8 @@ class DlgEnterVidNum ( wx.Dialog ):
         self.Centre( wx.BOTH )
 
         # Connect Events
-        self.m_sdbSizer1Apply.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumApply )
-        self.m_sdbSizer1Cancel.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumCancel )
+        self.m_sdbtn_Sizer1Apply.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumApply )
+        self.m_sdbtn_Sizer1Cancel.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumCancel )
     # end class DlgEnterVidNum().__init__()
 
     def __del__( self ):
@@ -196,24 +197,23 @@ class MainFrame ( wx.Frame ):
                             size = wx.Size( 1245,1193 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
         # inserted by aftercopyfilefrom to be copied after "wx.Frame.__init__"
-        self.m_absRunPath = absRunPath # absolute path we were run from
-        self.m_txtFilePath = "UNKNOWN" # absolute path to open text file
-        self.m_txtFileLines = []       # lines for open text file, stripped
-        self.m_txtFileIdx = -1         # which line for open text file or -1
-        self.m_txtFileModified = False # will be true when modifications are made
-        self.m_mediaLength = None # the length of media file; appears to be in milliseconds
-        self.m_mediaLoad = False  # True when media load done until timer processes it
-        self.m_mediaStartStopDisplay = False # yet another media load flag
-        self.m_mediaCurrentWeirdNum = "_0001"
-        self.m_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
-        self.m_infoFile = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
-        self.m_listCtrlInfo = {} # [validWeirdNum] = {"line": -1} , others TBD
-        self.m_listCtrlSlctd = {"prev": "_0001", "curr": "_0001"}
-        self.m_textCtrlEntry_unchanged = ""
-        self.m_textCtrlEntry_edited = ""
-        self.mdoMediaCtrls = True # ShowPlayerControls does not seem to work
+        self.l_absRunPath = absRunPath # absolute path we were run from
+        self.l_txtFilePath = "UNKNOWN" # absolute path to open text file
+        self.l_txtFileLines = []       # lines for open text file, stripped
+        self.l_txtFileIdx = -1         # which line for open text file or -1
+        self.l_txtFileModified = False # will be true when modifications are made
+        self.l_mediaLength = None # the length of media file; appears to be in milliseconds
+        self.l_mediaStartStopDisplay = False # yet another media load flag
+        self.l_mediaCurrentWeirdNum = "_0001"
+        self.l_mediaMtime = "" # time.ctime(os.path.getmtime(<<thepath>>))
+        self.l_infoMaxImgMvi = {}   # filled with max nums, example {'THE_MAX_IMGNUM': 45065, 'THE_MAX_MVINUM': 3441}
+        self.l_listCtrlInfo = {} # [validWeirdNum] = {"line": -1} , others TBD
+        self.l_listCtrlSlctd = {"prev": "_0001", "curr": "_0001"}
+        self.l_textCtrlEntry_unchanged = ""
+        self.l_textCtrlEntry_edited = ""
+        self.l_mdoMediaCtrls = True # ShowPlayerControls does not seem to work
         
-        self.SetIcon(wx.Icon(os.path.join(self.m_absRunPath,"MadScience_256.ico"))) # Mark: set icon
+        self.SetIcon(wx.Icon(os.path.join(self.l_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
         bSizerFrame = wx.BoxSizer( wx.VERTICAL )
 
@@ -230,7 +230,7 @@ class MainFrame ( wx.Frame ):
 
         bSizerPanel.Add( self.m_staticTextStatus, 0, wx.ALL|wx.EXPAND, 5 )
         self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))
-        if not self.mdoMediaCtrls:
+        if not self.l_mdoMediaCtrls:
             self.m_mediactrl.ShowPlayerControls(flags=wx.media.MEDIACTRLPLAYERCONTROLS_DEFAULT) # does not seem to work
         bSizerPanel.Add( self.m_mediactrl, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
@@ -246,7 +246,7 @@ class MainFrame ( wx.Frame ):
 
         bSizer3.Add( self.m_buttonPrev, 0, wx.ALL, 5 )
 
-        if self.mdoMediaCtrls:
+        if self.l_mdoMediaCtrls:
             self.m_buttonPlay = wx.Button( self.m_panel1, wx.ID_ANY, u">", wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_buttonPlay.SetToolTip( u"Play" )
 
@@ -356,7 +356,7 @@ class MainFrame ( wx.Frame ):
         # Connect Events
         self.m_buttonPrevfile.Bind( wx.EVT_BUTTON, self.onBtnPrevFile )
         self.m_buttonPrev.Bind( wx.EVT_BUTTON, self.onBtnPrev )
-        if self.mdoMediaCtrls:
+        if self.l_mdoMediaCtrls:
             self.m_buttonPlay.Bind( wx.EVT_BUTTON, self.onBtnPlay )
             self.m_buttonPause.Bind( wx.EVT_BUTTON, self.onBtnPause )
         self.m_buttonNext.Bind( wx.EVT_BUTTON, self.onBtnNext )
@@ -385,17 +385,17 @@ class MainFrame ( wx.Frame ):
     def onBtnPrevFile( self, event ):
         possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
         if possibleIdx >= 0:
-            self.m_txtFileIdx = possibleIdx
-            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5],
-                                                statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+            self.l_txtFileIdx = possibleIdx
+            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.l_txtFileLines[self.l_txtFileIdx][:5],
+                                                statusText= self.l_txtFileLines[self.l_txtFileIdx] )
     # end class MainFrame().onBtnPrevFile()
 
     def onBtnPrev( self, event ):
-        ignore, mediaDecNum = fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
-        # print("fromMarksWeirdNumbers m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.m_mediaCurrentWeirdNum, ignore, mediaDecNum))
+        ignore, mediaDecNum = fromMarksWeirdNumbers(self.l_mediaCurrentWeirdNum)
+        # print("fromMarksWeirdNumbers m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.l_mediaCurrentWeirdNum, ignore, mediaDecNum))
         if mediaDecNum > 1:
             mediaDecNum -= 1
-        # print("decrement m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.m_mediaCurrentWeirdNum, ignore, mediaDecNum))
+        # print("decrement m_mediaCurrentWeirdNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (self.l_mediaCurrentWeirdNum, ignore, mediaDecNum))
         ignore, weirdMediaNum = toMarksWeirdNumbers(mediaDecNum)
         # print("toMarksWeirdNumbers weirdMediaNum: |%s| ignore: |%s| mediaDecNum: |%s|" % (weirdMediaNum, ignore, mediaDecNum))
         self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
@@ -416,9 +416,9 @@ class MainFrame ( wx.Frame ):
 
 
     def onBtnNext( self, event ):
-        ignore, mediaDecNum = fromMarksWeirdNumbers(self.m_mediaCurrentWeirdNum)
-        # FIXME Pix vs Movies
-        if mediaDecNum < self.m_infoFile["THE_MAX_MVINUM"]:
+        ignore, mediaDecNum = fromMarksWeirdNumbers(self.l_mediaCurrentWeirdNum)
+        # TODO FIXME Pix vs Movies
+        if mediaDecNum < self.l_infoMaxImgMvi["THE_MAX_MVINUM"]:
             mediaDecNum += 1
             ignore, weirdMediaNum = toMarksWeirdNumbers(mediaDecNum)
             self.doLoadupNumMediaFile( mediaWeirdNum = weirdMediaNum, statusText = "non-text-file %d" % mediaDecNum )
@@ -429,9 +429,9 @@ class MainFrame ( wx.Frame ):
     def onBtnNextFile( self, event ):
         possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
         if possibleIdx >= 0:
-            self.m_txtFileIdx = possibleIdx
-            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5],
-                                                statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+            self.l_txtFileIdx = possibleIdx
+            ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.l_txtFileLines[self.l_txtFileIdx][:5],
+                                                statusText= self.l_txtFileLines[self.l_txtFileIdx] )
     # end class MainFrame().onBtnNextFile()
 
 
@@ -499,18 +499,18 @@ class MainFrame ( wx.Frame ):
             # media line
             self.m_listCtrlVidComments.InsertItem(posn, line[:5])
             self.m_listCtrlVidComments.SetItem(posn, 1, line[5:].strip())
-            if line[:5] in self.m_listCtrlInfo.keys():
-                self.m_listCtrlInfo[line[:5]]["line"].append(posn)
+            if line[:5] in self.l_listCtrlInfo.keys():
+                self.l_listCtrlInfo[line[:5]]["line"].append(posn)
             else:
-                self.m_listCtrlInfo[line[:5]] = {"line": [posn]}
+                self.l_listCtrlInfo[line[:5]] = {"line": [posn]}
         else:
             # comment
             self.m_listCtrlVidComments.InsertItem(posn, " ")
             self.m_listCtrlVidComments.SetItem(posn, 1, line)
-            if " " in self.m_listCtrlInfo.keys():
-                self.m_listCtrlInfo[" "]["line"].append(posn)
+            if " " in self.l_listCtrlInfo.keys():
+                self.l_listCtrlInfo[" "]["line"].append(posn)
             else:
-                self.m_listCtrlInfo[" "] = {"line": [posn]}
+                self.l_listCtrlInfo[" "] = {"line": [posn]}
         # alternating colors
         if posn % 2:
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "white")
@@ -518,16 +518,18 @@ class MainFrame ( wx.Frame ):
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "yellow")
     # end class MainFrame().doAddListCtrlLine()
 
-    def OnFileOpen( self, event ):
-        # FIXME Pix vs Movies
+    def OnFileOpen(self, event):
+        # TODO FIXME Pix vs Movies
         dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file in complete Olson www folder",
                             defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt",
                             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
             loadOK = True
-            pathTxt = os.path.abspath(dlg.GetPath())
-            pathRootDir = os.path.dirname(pathTxt)
-            pathPictureInfo = os.path.join(pathRootDir, "OlsonPictureInfo.php")
+            lcltmp_pathTxtFile = os.path.abspath(dlg.GetPath())
+            self.l_filename = dlg.GetFilename()
+            self.l_dirname = os.path.dirname(lcltmp_pathTxtFile)
+            lcltmp_pathTxtFile = os.path.join(self.l_dirname, self.l_filename)
+            pathPictureInfo = os.path.join(self.l_dirname, "OlsonPictureInfo.php")
             if False == os.path.exists(pathPictureInfo):
                 wx.MessageBox("Unable to load required Info file %s: file does not exist" % pathPictureInfo,
                               "ERROR", wx.ICON_ERROR | wx.OK)
@@ -535,16 +537,16 @@ class MainFrame ( wx.Frame ):
             if loadOK:
                 retn = self.doLoadInfoFile(pathPictureInfo)
                 if "OK" != retn:
-                    wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+                    wx.MessageBox("Unable to load %s: %s" % (lcltmp_pathTxtFile, retn), "ERROR", wx.ICON_ERROR | wx.OK)
                     loadOK = False
             if loadOK:
-                retn = self.doLoadTextFile(pathTxt)
+                retn = self.doLoadTextFile(lcltmp_pathTxtFile)
                 if "OK" != retn:
-                    wx.MessageBox("Unable to load %s: %s" % (pathTxt, retn), "ERROR", wx.ICON_ERROR | wx.OK)
+                    wx.MessageBox("Unable to load %s: %s" % (lcltmp_pathTxtFile, retn), "ERROR", wx.ICON_ERROR | wx.OK)
                     loadOK = False
             if loadOK:
-                loadOK = self.doLoadupNumMediaFile( mediaWeirdNum = self.m_txtFileLines[self.m_txtFileIdx][:5],
-                                                    statusText= self.m_txtFileLines[self.m_txtFileIdx] )
+                loadOK = self.doLoadupNumMediaFile(mediaWeirdNum=self.l_txtFileLines[self.l_txtFileIdx][:5],
+                                                   statusText=self.l_txtFileLines[self.l_txtFileIdx])
     # end class MainFrame().OnFileOpen()
 
     def doGetTxtFileLines(self, fname):
@@ -587,65 +589,65 @@ class MainFrame ( wx.Frame ):
         # should contain lines that look like this:
         # define("THE_MAX_IMGNUM","45065");
         # define("THE_MAX_MVINUM","3441");
-        self.m_infoFile = {}
-        infoFile = {"THE_MAX_IMGNUM": -1, "THE_MAX_MVINUM": -1}
-        retn, infoLines = self.doGetTxtFileLines( fname )
+        self.l_infoMaxImgMvi = {}
+        lcl_infoFile = {"THE_MAX_IMGNUM": -1, "THE_MAX_MVINUM": -1}
+        retn, lcltmp_infoLines = self.doGetTxtFileLines( fname )
         if "OK" != retn:
             return retn
-        for line in infoLines:
-            for key in infoFile.keys():
+        for line in lcltmp_infoLines:
+            for key in lcl_infoFile.keys():
                 if -1 != line.find(key):
                     lsplit = line.split('"')
                     try:
-                        infoFile[key] = int(lsplit[-2])
+                        lcl_infoFile[key] = int(lsplit[-2])
                     except:
-                        infoFile[key] = -1
+                        lcl_infoFile[key] = -1
                         retn = "ERROR: file %s not in infoFile format" % fname
-        if ("OK" == retn) and (infoFile["THE_MAX_IMGNUM"] > 0) and (infoFile["THE_MAX_MVINUM"] > 0):
-            # infoFile is good; store it
-            self.m_infoFile = infoFile
-            # let's just see if the info in infoFile is up to date, shall we?
-            # FIXME Pix vs Movies
-            ignore, mediaWeirdNum = toMarksWeirdNumbers(infoFile["THE_MAX_MVINUM"])
-            mediaDirList = sorted(os.listdir((os.path.join(os.path.dirname(fname), 'movies', mediaWeirdNum[:2]))))
-            mp4List = []
-            for mDirFile in mediaDirList:
+        if ("OK" == retn) and (lcl_infoFile["THE_MAX_IMGNUM"] > 0) and (lcl_infoFile["THE_MAX_MVINUM"] > 0):
+            # lcl_infoFile is good; store it
+            self.l_infoMaxImgMvi = lcl_infoFile
+            # let's just see if the info in lcl_infoFile is up to date, shall we?
+            # TODO FIXME Pix vs Movies
+            ignore, lcl_mediaWeirdNum = toMarksWeirdNumbers(lcl_infoFile["THE_MAX_MVINUM"])
+            lcl_mediaDirList = sorted(os.listdir((os.path.join(os.path.dirname(fname), 'movies', lcl_mediaWeirdNum[:2]))))
+            lcl_mp4List = []
+            for mDirFile in lcl_mediaDirList:
                 if mDirFile.endswith(".MP4"):
-                   mp4List.append(mDirFile)
-            # FIXME Pix vs Movies TODO
-            expectedLastFile = "MVI"+mediaWeirdNum+".MP4"
-            found = -1
-            if expectedLastFile in mp4List:
-                found = mp4List.index(expectedLastFile)
-            if found < 0:
-                # FIXME Pix vs Movies
+                   lcl_mp4List.append(mDirFile)
+            # TODO FIXME Pix vs Movies TODO
+            lcl_expectedLastFile = "MVI"+lcl_mediaWeirdNum+".MP4"
+            lcl_found = -1
+            if lcl_expectedLastFile in lcl_mp4List:
+                lcl_found = lcl_mp4List.index(lcl_expectedLastFile)
+            if lcl_found < 0:
+                # TODO FIXME Pix vs Movies
                 wx.MessageBox("Warning: directory structure does not include \"%s\" media directory files per infoFile %s" % ("movie", fname), "ERROR", wx.ICON_ERROR | wx.OK)
-            elif (found + 1) != len(mp4List):
-                ignore, decNum =  fromMarksWeirdNumbers(mp4List[-1][3:3+5], quiet=True)
-                wx.MessageBox("Warning: \"%s\" media directory files per infoFile %s\nExpected last file was %s (%d)\nActual last file in directory was %s (%d)" % ("movie", fname, expectedLastFile, infoFile["THE_MAX_MVINUM"], mp4List[-1], decNum), "ERROR", wx.ICON_ERROR | wx.OK)
+            elif (lcl_found + 1) != len(lcl_mp4List):
+                ignore, lcl_decNum =  fromMarksWeirdNumbers(lcl_mp4List[-1][3:3+5], quiet=True)
+                wx.MessageBox("Warning: \"%s\" media directory files per infoFile %s\nExpected last file was %s (%d)\nActual last file in directory was %s (%d)" % ("movie", fname, lcl_expectedLastFile, lcl_infoFile["THE_MAX_MVINUM"], lcl_mp4List[-1], lcl_decNum), "ERROR", wx.ICON_ERROR | wx.OK)
         return retn
     # end class MainFrame().doLoadInfoFile()
 
     def doLoadTextFile(self, fname):
         """Opens text file"""
-        self.m_txtFileIdx = -1
-        retn, self.m_txtFileLines = self.doGetTxtFileLines( fname )
+        self.l_txtFileIdx = -1
+        retn, self.l_txtFileLines = self.doGetTxtFileLines( fname )
         if "OK" != retn:
-            self.m_txtFileLines = []
+            self.l_txtFileLines = []
             return retn
-        if ("#" != self.m_txtFileLines[-1][0]) or (-1 == self.m_txtFileLines[-1].find("END OF FILE")):
-            self.m_txtFileLines = []
+        if ("#" != self.l_txtFileLines[-1][0]) or (-1 == self.l_txtFileLines[-1].find("END OF FILE")):
+            self.l_txtFileLines = []
             return "ERROR: file %s last line is not # ... END OF FILE" % fname
-        self.m_txtFilePath = os.path.abspath(fname)
-        self.rootDir = os.path.dirname(self.m_txtFilePath)
-        for line in self.m_txtFileLines:
+        self.l_txtFilePath = os.path.abspath(fname)
+        self.l_rootDir = os.path.dirname(self.l_txtFilePath)
+        for line in self.l_txtFileLines:
             self.doAddListCtrlLine(line, self.m_listCtrlVidComments.GetItemCount())
-        self.m_txtFileIdx = len(self.m_txtFileLines)-1
-        self.m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
-        if self.m_txtFileIdx < 0:
-            self.m_txtFileLines = []
+        self.l_txtFileIdx = len(self.l_txtFileLines)-1
+        self.l_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
+        if self.l_txtFileIdx < 0:
+            self.l_txtFileLines = []
             retn = "ERROR: file %s has no non-comment lines" % fname
-        self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
+        self.m_listCtrlVidComments.EnsureVisible(self.l_txtFileIdx)
         return retn
     # end class MainFrame().doLoadTextFile()
 
@@ -654,9 +656,9 @@ class MainFrame ( wx.Frame ):
         nowStatus = self.m_staticTextStatus.GetLabel()
         nowTextCtrlEntry = self.m_textCtrlEntry.GetValue()
         self.m_staticTextStatus.SetLabel("Status: loading %s ..." % mediaWeirdNum)
-        # FIXME Pix vs Movies
-        self.m_mediaLength = None
-        mediaFile = os.path.join(self.rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
+        # TODO FIXME Pix vs Movies
+        self.l_mediaLength = None
+        mediaFile = os.path.join(self.l_rootDir, 'movies', mediaWeirdNum[:2], "MVI"+mediaWeirdNum+".MP4")
         if False == os.path.exists(mediaFile):
             txt = "Media file %s does not exist" % mediaFile
             self.m_staticTextStatus.SetLabel("Status: %s" % txt)
@@ -670,42 +672,42 @@ class MainFrame ( wx.Frame ):
                 loadOK = False
             else:
                 # print(" m_bLoaded=%d" % self.m_mediactrl.m_bLoaded) # not in wxPython
-                self.m_staticTextStatus.SetLabel("Status: %s (%s)" % (statusText, self.m_mediaMtime))
+                self.m_staticTextStatus.SetLabel("Status: %s (%s)" % (statusText, self.l_mediaMtime))
                 self.m_mediactrl.SetInitialSize()
                 self.GetSizer().Layout()
-                self.m_mediaMtime = time.ctime(os.path.getmtime(mediaFile))
-                self.m_mediaCurrentWeirdNum = mediaWeirdNum
-        self.m_mediaStartStopDisplay = loadOK
+                self.l_mediaMtime = time.ctime(os.path.getmtime(mediaFile))
+                self.l_mediaCurrentWeirdNum = mediaWeirdNum
+        self.l_mediaStartStopDisplay = loadOK
         if not loadOK:
             self.m_staticTextStatus.SetLabel(nowStatus)
             self.m_textCtrlEntry.ChangeValue(nowTextCtrlEntry) # avoid generating wxEVT_TEXT with SetValue
         else:
-            if nowTextCtrlEntry != self.m_textCtrlEntry_unchanged:
-               pass # FIXME save edited text
-            self.m_listCtrlSlctd["prev"] = self.m_listCtrlSlctd["curr"]
-            self.m_listCtrlSlctd["curr"] = mediaWeirdNum
-            theListCtrlLine = self.getListCtrlLine(self.m_listCtrlSlctd["prev"])
+            if nowTextCtrlEntry != self.l_textCtrlEntry_unchanged:
+               pass # TODO FIXME save edited text
+            self.l_listCtrlSlctd["prev"] = self.l_listCtrlSlctd["curr"]
+            self.l_listCtrlSlctd["curr"] = mediaWeirdNum
+            theListCtrlLine = self.getListCtrlLine(self.l_listCtrlSlctd["prev"])
             if theListCtrlLine >= 0:
                 self.m_listCtrlVidComments.Select(theListCtrlLine, 0)
             bestMatchLine = self.getListCtrlLine(mediaWeirdNum)
             if bestMatchLine >= 0: # landed on a line in the text file
-                self.m_txtFileIdx = bestMatchLine
-                self.m_listCtrlVidComments.Select(self.m_txtFileIdx, 1)
-                self.m_listCtrlVidComments.EnsureVisible(self.m_txtFileIdx)
-                self.m_textCtrlEntry_unchanged = self.m_textCtrlEntry_edited = self.m_txtFileLines[bestMatchLine]
-                self.m_textCtrlEntry.ChangeValue(self.m_textCtrlEntry_unchanged) # avoid generating wxEVT_TEXT with SetValue
+                self.l_txtFileIdx = bestMatchLine
+                self.m_listCtrlVidComments.Select(self.l_txtFileIdx, 1)
+                self.m_listCtrlVidComments.EnsureVisible(self.l_txtFileIdx)
+                self.l_textCtrlEntry_unchanged = self.l_textCtrlEntry_edited = self.l_txtFileLines[bestMatchLine]
+                self.m_textCtrlEntry.ChangeValue(self.l_textCtrlEntry_unchanged) # avoid generating wxEVT_TEXT with SetValue
             else: # did not land on a line in the text file
-                self.m_textCtrlEntry_unchanged = self.m_textCtrlEntry_edited = ""
+                self.l_textCtrlEntry_unchanged = self.l_textCtrlEntry_edited = ""
                 self.m_textCtrlEntry.ChangeValue("") # avoid generating wxEVT_TEXT with SetValue
                 pass
-        return loadOK
+        return loadOK # we already notified the user as needed
     # end class MainFrame().doLoadupNumMediaFile()
 
     def getListCtrlLine(self, mediaWeirdNum):
         lineNum = -1
-        # FIXME make it choose the same one the user clicked if more than one of same in listctrl
-        if mediaWeirdNum in self.m_listCtrlInfo.keys():
-            lineNum = self.m_listCtrlInfo[mediaWeirdNum]["line"][0]
+        # TODO FIXME make it choose the same one the user clicked if more than one of same in listctrl
+        if mediaWeirdNum in self.l_listCtrlInfo.keys():
+            lineNum = self.l_listCtrlInfo[mediaWeirdNum]["line"][0]
         return lineNum
     # end class MainFrame().getListCtrlLine()
 
@@ -713,12 +715,12 @@ class MainFrame ( wx.Frame ):
         """finds m_txtFileLines Usable Line idx in direction direc or -1"""
         foundit = -1
         good = False
-        idx = self.m_txtFileIdx
+        idx = self.l_txtFileIdx
         while True:
             idx += direc
-            if (idx < 0) or (idx >= len(self.m_txtFileLines)):
+            if (idx < 0) or (idx >= len(self.l_txtFileLines)):
                 break
-            good, ignore = fromMarksWeirdNumbers(self.m_txtFileLines[idx], quiet=True)
+            good, ignore = fromMarksWeirdNumbers(self.l_txtFileLines[idx], quiet=True)
             if good != True:
                 continue
             else:
@@ -727,39 +729,42 @@ class MainFrame ( wx.Frame ):
         return foundit
     # end class MainFrame().doFindDirecTextFileUsableLine()
 
-    def onFileSave( self, event ):
-        event.Skip()            # TODO need to write this one
-    # end class MainFrame().onFileSave()
-
-    def onFileSaveAs( self, event ):
-        dlg = fPtr = None
+    def writeMediaFile(self):
+        fPtr = None
         try:
-            dlg = wx.FileDialog(self, "Save to file:", ".", "", "Text (*.txt)|*.txt", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-            if (dlg.ShowModal() == wx.ID_OK):
-                self.filename = dlg.GetFilename()
-                self.dirname = dlg.GetDirectory()
-                fPtr = open(os.path.join(self.dirname, self.filename), 'wt')
-                for myLnum in range(self.m_listCtrlVidComments.GetItemCount()):
-                    textNum = self.m_listCtrlVidComments.GetItemText(myLnum, 0)
-                    textString = self.m_listCtrlVidComments.GetItemText(myLnum, 1)
-                    mediaFlag, ignore = fromMarksWeirdNumbers(textNum, quiet=True)
-                    if mediaFlag:
-                        fPtr.write("%s %s\n" % (textNum, textString))
-                    else:
-                        fPtr.write("%s\n" % (textString))
-                fPtr.close()
-                fPtr = None
-            dlg.Destroy()
-            dlg = None
+            fPtr = open(os.path.join(self.l_dirname, self.l_filename), 'wt')
+            for myLnum in range(self.m_listCtrlVidComments.GetItemCount()):
+                textNum = self.m_listCtrlVidComments.GetItemText(myLnum, 0)
+                textString = self.m_listCtrlVidComments.GetItemText(myLnum, 1)
+                mediaFlag, ignore = fromMarksWeirdNumbers(textNum, quiet=True)
+                if mediaFlag:
+                    fPtr.write("%s %s\n" % (textNum, textString))
+                else:
+                    fPtr.write("%s\n" % (textString))
+            fPtr.close()
+            fPtr = None
         except:
             message = wx.MessageDialog(self, _("Could not save file; file not saved. Try again."),
                                        _("ERROR"), wx.OK | wx.ICON_ERROR)
             message.ShowModal()
             message.Destroy()
-            if dlg is not None:
-                dlg.Destroy()
             if fPtr is not None:
-                f.close()
+                fPtr.close()
+    # end MainFrame().writeMediaFile(self):
+
+    def onFileSave( self, event ):
+        event.Skip()            # TODO need to write this one
+    # end class MainFrame().onFileSave()
+
+    def onFileSaveAs( self, event ):
+        dlg = None
+        dlg = wx.FileDialog(self, "Save to file:", ".", "", "Text (*.txt)|*.txt", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if (dlg.ShowModal() == wx.ID_OK):
+            self.l_filename = dlg.GetFilename()
+            self.l_dirname = dlg.GetDirectory()
+            self.writeMediaFile()
+        dlg.Destroy()
+        dlg = None
     # end class MainFrame().onFileSaveAs()
 
     def OnFileQuit( self, event ):
@@ -779,7 +784,7 @@ class MainFrame ( wx.Frame ):
         event.Skip()            # TODO need to write this one
     # end class MainFrame().onHelpAbout()
 
-    """FIXME TODO start/stop movie on click in movie window
+    """TODO FIXME TODO start/stop movie on click in movie window
     def onMouseUpLeftUp( self, event): # if click in movie window, toggle play-stop for movie
         myX, myY = self.self.m_mediactrl.ScreenToClient(wx.GetMousePosition())
         print("myX=%d, myY=%d" % (myX, myY))
@@ -794,18 +799,18 @@ class MainFrame ( wx.Frame ):
         # some time after that it goes to number of millisecs (ex: 9637)
         # then some time later it rounds off to the seconds (ex: 9000); I don't know why
         # we want to keep the 9637 from the example above
-        if self.m_mediaStartStopDisplay: # set True to load to a bit past the start
+        if self.l_mediaStartStopDisplay: # set True to load to a bit past the start
             tmp = self.m_mediactrl.Length()
-            if ((None == self.m_mediaLength) or (self.m_mediaLength <= 0)) and ((tmp > 0) and (self.m_mediaLength != tmp)):
-                self.m_mediaLength = self.m_mediactrl.Length()
-                # print("timer length %s" % self.m_mediaLength)
+            if ((None == self.l_mediaLength) or (self.l_mediaLength <= 0)) and ((tmp > 0) and (self.l_mediaLength != tmp)):
+                self.l_mediaLength = self.m_mediactrl.Length()
+                # print("timer length %s" % self.l_mediaLength)
                 if self.m_mediactrl.Play():
                     # print("timer: Play worked")
                     self.m_mediactrl.SetInitialSize()
                     self.GetSizer().Layout()
                     sleep(0.05) # sleep seconds
                     self.m_mediactrl.Pause()
-                    self.m_mediaStartStopDisplay = False
+                    self.l_mediaStartStopDisplay = False
     # end class MainFrame().onTimerMedia()
 
 

@@ -43,7 +43,7 @@ MarksWeirdDigits = ["_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 
 
 def fromMarksWeirdNumbers(theNumberText, quiet=False):
-    if type(theNumberText) != type('_A123'):
+    if not isinstance(theNumberText, type('_A123')):
         if quiet is False:
             ignore = wx.MessageBox(
                 "ERROR: cannot convert input type %s - inside fromMarksWeirdNumbers()" % (type(theNumberText)),
@@ -76,9 +76,9 @@ def toMarksWeirdNumbers(theNumber, quiet=False):
     # see MarksWeirdDigits[] for description of strange numbering scheme
     good = True
     converted = "_0000"  # zero
-    if type(theNumber) == type("123"):  # if it is a string
+    if isinstance(theNumber, type("123")):  # if it is a string
         theNumber = int(theNumber)
-    if type(theNumber) != type(123):
+    if not isinstance(theNumber, type(123)): # if it is not a number
         if quiet is False:
             ignore = wx.MessageBox(
                 "ERROR: cannot convert %s type %s inside toMarksWeirdNumbers()" % (str(theNumber), type(theNumber)),
@@ -162,7 +162,7 @@ class DlgEnterVidNum ( wx.Dialog ):
         pass
     # end class DlgEnterVidNum().__del__()
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def onDlgBtnEnterVidNumApply( self, event ):
         nowTextCtrl2 = self.m_textCtrl2.GetValue() # MDO_Here
         # see if this is a valid number; should be one of my weird numbers
@@ -189,6 +189,24 @@ class DlgEnterVidNum ( wx.Dialog ):
 
 ###########################################################################
 ## Class MainFrame
+##   local non-control variables
+##     self.l_absRunPath    - absolute path we were run from; used to find resources such as the icon
+##     self.l_dbDirName     - path to directory for database (db) text file
+##     self.l_dbFileName    - filename (no path) for database (db) text file
+##     self.l_dbMediaDescripIdx     - if no db or no line select -1, else line number (starting @ 0) currently displayed
+##     self.l_dbMediaDescripLines   - lines for open db text file, stripped
+##     self.l_dbMediaDescripModified - will be True if db text file edits not yet saved to l_dbFileName
+##     self.l_dbMediaDescripPath    - absolute path to the open db text file
+##     self.l_infoMaxImgMvi         - maximum numbers for pix and mvi media in decimal
+##     self.l_listCtrlInfo          - where display version of db text file is stored; not exact txt format
+##     self.l_listCtrlSlctd         - prev and curr lines; TODO candidate for deletion, maybe use when editing
+##     self.l_mediaCurrentWeirdNum  - mediaWeirdNum of currently displayed file
+##     self.l_mediaLength           - self.m_mediactrl.Length() (millisec) of currently displayed video or else None
+##     self.l_mediaMtime            - time.ctime(os.path.getmtime(mediaFile)) date/time file modified
+##     self.l_mediaStartStopDisplay - set True to load movie video to a bit past the start (otherwise blank)
+##     self.l_rootDir               - absolute path to the root directory: has db text file and dirs for all media
+##     self.l_textCtrlEntry_unchanged - copy of single db text file entry to compare to see if user changed it
+##     self.l_useMdoMediaCtrls      - True to use my clunky controls; set false when ShowPlayerControls() works
 ###########################################################################
 
 class MainFrame ( wx.Frame ):
@@ -210,7 +228,6 @@ class MainFrame ( wx.Frame ):
         self.l_listCtrlInfo = {} # [validWeirdNum] = {"line": -1} , others TBD
         self.l_listCtrlSlctd = {"prev": "_0001", "curr": "_0001"}
         self.l_textCtrlEntry_unchanged = ""
-        self.l_textCtrlEntry_edited = ""
         self.l_useMdoMediaCtrls = True # ShowPlayerControls does not seem to work
         
         self.SetIcon(wx.Icon(os.path.join(self.l_absRunPath,"MadScience_256.ico"))) # Mark: set icon
@@ -380,7 +397,7 @@ class MainFrame ( wx.Frame ):
     # end class MainFrame().__del__()
 
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def onBtnPrevFile( self, event ):
         possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
         if possibleIdx >= 0:
@@ -693,10 +710,10 @@ class MainFrame ( wx.Frame ):
                 self.l_dbMediaDescripIdx = bestMatchLine
                 self.m_listCtrlVidComments.Select(self.l_dbMediaDescripIdx, 1)
                 self.m_listCtrlVidComments.EnsureVisible(self.l_dbMediaDescripIdx)
-                self.l_textCtrlEntry_unchanged = self.l_textCtrlEntry_edited = self.l_dbMediaDescripLines[bestMatchLine]
+                self.l_textCtrlEntry_unchanged = self.l_dbMediaDescripLines[bestMatchLine]
                 self.m_textCtrlEntry.ChangeValue(self.l_textCtrlEntry_unchanged) # avoid generating wxEVT_TEXT with SetValue
             else: # did not land on a line in the text file
-                self.l_textCtrlEntry_unchanged = self.l_textCtrlEntry_edited = ""
+                self.l_textCtrlEntry_unchanged = ""
                 self.m_textCtrlEntry.ChangeValue("") # avoid generating wxEVT_TEXT with SetValue
                 pass
         return loadOK # we already notified the user as needed

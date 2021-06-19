@@ -103,7 +103,13 @@ def toMarksWeirdNumbers(theNumber, quiet=False):
 
 
 ###########################################################################
-## Class DlgEnterVidNum
+# Class DlgEnterVidNum
+#   local control variables
+#     self.m_sdbtn_Sizer1Apply     - to hold the "Apply" button
+#     self.m_sdbtn_Sizer1Cancel    - to hold the "Cancel" button
+#     self.m_staticTextDlgEnterVidNum       - static text telling how to enter video number
+#     self.m_staticTextDlgEnterVidNumStatus - static text telling what dialog is doing or waiting for
+#     self.m_textCtrl2             - text control that user types into
 ###########################################################################
 
 class DlgEnterVidNum ( wx.Dialog ):
@@ -188,25 +194,55 @@ class DlgEnterVidNum ( wx.Dialog ):
 
 
 ###########################################################################
-## Class MainFrame
-##   local non-control variables
-##     self.l_absRunPath    - absolute path we were run from; used to find resources such as the icon
-##     self.l_dbDirName     - path to directory for database (db) text file
-##     self.l_dbFileName    - filename (no path) for database (db) text file
-##     self.l_dbMediaDescripIdx     - if no db or no line select -1, else line number (starting @ 0) currently displayed
-##     self.l_dbMediaDescripLines   - lines for open db text file, stripped
-##     self.l_dbMediaDescripModified - will be True if db text file edits not yet saved to l_dbFileName
-##     self.l_dbMediaDescripPath    - absolute path to the open db text file
-##     self.l_infoMaxImgMvi         - maximum numbers for pix and mvi media in decimal
-##     self.l_listCtrlInfo          - where display version of db text file is stored; not exact txt format
-##     self.l_listCtrlSlctd         - prev and curr lines; TODO candidate for deletion, maybe use when editing
-##     self.l_mediaCurrentWeirdNum  - mediaWeirdNum of currently displayed file
-##     self.l_mediaLength           - self.m_mediactrl.Length() (millisec) of currently displayed video or else None
-##     self.l_mediaMtime            - time.ctime(os.path.getmtime(mediaFile)) date/time file modified
-##     self.l_mediaStartStopDisplay - set True to load movie video to a bit past the start (otherwise blank)
-##     self.l_rootDir               - absolute path to the root directory: has db text file and dirs for all media
-##     self.l_textCtrlEntry_unchanged - copy of single db text file entry to compare to see if user changed it
-##     self.l_useMdoMediaCtrls      - True to use my clunky controls; set false when ShowPlayerControls() works
+# Class MainFrame
+#   local non-control variables
+#     self.l_absRunPath             - absolute path we were run from; used to find resources such as the icon
+#     self.l_dbDirName              - path to directory for database (db) text file
+#     self.l_dbFileName             - filename (no path) for database (db) text file
+#     self.l_dbMediaDescripIdx      - if no db or no line select -1, else line number (starting @ 0) currently displayed
+#     self.l_dbMediaDescripLines    - lines for open db text file, stripped
+#     self.l_dbMediaDescripModified - will be True if db text file edits not yet saved to l_dbFileName
+#     self.l_dbMediaDescripPath     - absolute path to the open db text file
+#     self.l_infoMaxImgMvi          - maximum numbers for pix and mvi media in decimal
+#     self.l_listCtrlInfo           - where display version of db text file is stored; not exact txt format
+#     self.l_listCtrlSlctd          - prev and curr lines; TODO candidate for deletion, maybe use when editing
+#     self.l_mediaCurrentWeirdNum   - mediaWeirdNum of currently displayed file
+#     self.l_mediaLength            - self.m_mediactrl.Length() (millisec) of currently displayed video or else None
+#     self.l_mediaMtime             - time.ctime(os.path.getmtime(mediaFile)) date/time file modified
+#     self.l_mediaStartStopDisplay  - set True to load movie video to a bit past the start (otherwise blank)
+#     self.l_rootDir                - absolute path to the root directory: has db text file and dirs for all media
+#     self.l_textCtrlEntry_unchanged - copy of single db text file entry to compare to see if user changed it
+#     self.l_useMdoMediaCtrls       - True to use my clunky controls; set false when ShowPlayerControls() works
+#
+#   local control variables
+#     self.m_buttonEnterVidNum   - button to call DlgEnterVidNum() and manually enter video number
+#     self.m_buttonLouder        - video control - louder
+#     self.m_buttonPause         - video control - pause video play
+#     self.m_buttonPlay          - video control - play video
+#     self.m_buttonSofter        - video control - softer
+#     self.m_buttonNextNum       - video select - move to next numerical mediafile
+#     self.m_buttonPrevNum       - video select - move to previous numerical mediafile
+#     self.m_buttonNextDbFile    - video select - move to next mediafile listed in media db text file
+#     self.m_buttonPrevDbFile    - video select - move to previous mediafile listed in media db text file
+#     self.m_listCtrlVidComments - list control to hold media db text file
+#     self.m_mediactrl           - media control to play video
+#     self.m_menubarMainFrame    - the "menu" bar
+#     self.m_menuFile            - collection for "FILE" menu
+#     self.m_menuItemFileOpen    - menu - open media db text file
+#     self.m_menuItemFileSave    - menu - save media db text file using current name
+#     self.m_menuItemFileSaveAs  - menu - save media db text file using new name
+#     self.m_menuItemQuit        - menu - quit without save
+#     self.m_menuItemExit        - menu - exit and save
+#     self.m_menuHelp            - collection for "HELP" menu
+#     self.m_menuItemHelpAbout   - menu - help/about
+#     self.m_panel1              - video is displayed here
+#     self.m_staticTextStatus    - info about video being displayed
+#     self.m_textCtrlEntry       - enter/edit video comment here
+#     self.m_timerMedia          - timer needed to move a few seconds into movie so not blank screen
+#
+#  to get list of l_ or m_
+#    grep "self.l_.*[=]" MarkMedia.py | sed "s?self.l_?\nself.l_?g" | grep self.l_ | sed "s?[ ,\[\()].*??" | sort | uniq
+#    grep "self.m_.*[=]" MarkMedia.py | sed "s?self.m_?\nself.m_?g" | grep self.m_ | sed "s?[ ,\[\()].*??" | sort | uniq
 ###########################################################################
 
 class MainFrame ( wx.Frame ):
@@ -253,15 +289,15 @@ class MainFrame ( wx.Frame ):
 
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 
-        self.m_buttonPrevfile = wx.Button(self.m_panel1, wx.ID_ANY, u"|<textfile", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.m_buttonPrevfile.SetToolTip( u"Previous in text file" )
+        self.m_buttonPrevDbFile = wx.Button(self.m_panel1, wx.ID_ANY, u"|<textfile", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.m_buttonPrevDbFile.SetToolTip( u"Previous in text file" )
 
-        bSizer3.Add( self.m_buttonPrevfile, 0, wx.ALL, 5 )
+        bSizer3.Add( self.m_buttonPrevDbFile, 0, wx.ALL, 5 )
 
-        self.m_buttonPrev = wx.Button( self.m_panel1, wx.ID_ANY, u"|<", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_buttonPrev.SetToolTip( u"Previous media file" )
+        self.m_buttonPrevNum = wx.Button( self.m_panel1, wx.ID_ANY, u"|<", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_buttonPrevNum.SetToolTip( u"Previous media file" )
 
-        bSizer3.Add( self.m_buttonPrev, 0, wx.ALL, 5 )
+        bSizer3.Add( self.m_buttonPrevNum, 0, wx.ALL, 5 )
 
         if self.l_useMdoMediaCtrls:
             self.m_buttonPlay = wx.Button( self.m_panel1, wx.ID_ANY, u">", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -274,15 +310,15 @@ class MainFrame ( wx.Frame ):
 
             bSizer3.Add( self.m_buttonPause, 0, wx.ALL, 5 )
 
-        self.m_buttonNext = wx.Button( self.m_panel1, wx.ID_ANY, u">|", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_buttonNext.SetToolTip( u"Next media file" )
+        self.m_buttonNextNum = wx.Button( self.m_panel1, wx.ID_ANY, u">|", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_buttonNextNum.SetToolTip( u"Next media file" )
 
-        bSizer3.Add( self.m_buttonNext, 0, wx.ALL, 5 )
+        bSizer3.Add( self.m_buttonNextNum, 0, wx.ALL, 5 )
 
-        self.m_buttonNextFile = wx.Button(self.m_panel1, wx.ID_ANY, u"textfile>|", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.m_buttonNextFile.SetToolTip( u"Next in text file" )
+        self.m_buttonNextDbFile = wx.Button(self.m_panel1, wx.ID_ANY, u"textfile>|", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.m_buttonNextDbFile.SetToolTip( u"Next in text file" )
 
-        bSizer3.Add( self.m_buttonNextFile, 0, wx.ALL, 5 )
+        bSizer3.Add( self.m_buttonNextDbFile, 0, wx.ALL, 5 )
 
         self.m_buttonEnterVidNum = wx.Button(self.m_panel1, wx.ID_ANY, u"Enter #...", wx.DefaultPosition, wx.DefaultSize, 0)
         self.m_buttonEnterVidNum.SetToolTip( u"Enter media number" )
@@ -348,9 +384,9 @@ class MainFrame ( wx.Frame ):
                                            wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menuFile.Append( self.m_menuItemQuit )
 
-        self.m_menuItemeExit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Exit and save",
+        self.m_menuItemExit = wx.MenuItem( self.m_menuFile, wx.ID_ANY, u"Exit and save",
                                             wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_menuFile.Append( self.m_menuItemeExit )
+        self.m_menuFile.Append( self.m_menuItemExit )
 
         self.m_menubarMainFrame.Append( self.m_menuFile, u"File" )
 
@@ -370,13 +406,13 @@ class MainFrame ( wx.Frame ):
         self.Centre( wx.BOTH )
 
         # Connect Events
-        self.m_buttonPrevfile.Bind( wx.EVT_BUTTON, self.onBtnPrevFile )
-        self.m_buttonPrev.Bind( wx.EVT_BUTTON, self.onBtnPrev )
+        self.m_buttonPrevDbFile.Bind( wx.EVT_BUTTON, self.onBtnPrevFile )
+        self.m_buttonPrevNum.Bind( wx.EVT_BUTTON, self.onBtnPrev )
         if self.l_useMdoMediaCtrls:
             self.m_buttonPlay.Bind( wx.EVT_BUTTON, self.onBtnPlay )
             self.m_buttonPause.Bind( wx.EVT_BUTTON, self.onBtnPause )
-        self.m_buttonNext.Bind( wx.EVT_BUTTON, self.onBtnNext )
-        self.m_buttonNextFile.Bind( wx.EVT_BUTTON, self.onBtnNextFile )
+        self.m_buttonNextNum.Bind( wx.EVT_BUTTON, self.onBtnNext )
+        self.m_buttonNextDbFile.Bind( wx.EVT_BUTTON, self.onBtnNextFile )
         self.m_buttonEnterVidNum.Bind( wx.EVT_BUTTON, self.onBtnEnterVidNum )
         self.m_buttonLouder.Bind( wx.EVT_BUTTON, self.onBtnLouder )
         self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
@@ -386,7 +422,7 @@ class MainFrame ( wx.Frame ):
         self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
         self.Bind( wx.EVT_MENU, self.onFileSaveAs, id = self.m_menuItemFileSaveAs.GetId() )
         self.Bind( wx.EVT_MENU, self.OnFileQuit, id = self.m_menuItemQuit.GetId() )
-        self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemeExit.GetId() )
+        self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemExit.GetId() )
         self.Bind( wx.EVT_MENU, self.onHelpAbout, id = self.m_menuItemHelpAbout.GetId() )
         self.Bind( wx.EVT_TIMER, self.onTimerMedia, id=wx.ID_ANY )
     # end class MainFrame().__init__()

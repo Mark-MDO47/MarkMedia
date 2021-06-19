@@ -29,7 +29,7 @@ _ = gettext.gettext
 ## some globals - need use by everyone
 ###########################################################################
 
-# for historical reasons numbering is
+# for historical reasons Weird numbering is
 #   leftmost digit: _01...9A...Z re: [_0-9A-Z]
 #   next     digit: 01...9A...Z  re: [0-9A-Z]
 #   next 3  digits: 01...9       re: [0-9]
@@ -40,7 +40,6 @@ MarksWeirdDigits = ["_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                     "0123456789",
                     "0123456789"
                    ]
-
 
 def fromMarksWeirdNumbers(theNumberText, quiet=False):
     if not isinstance(theNumberText, type('_A123')):
@@ -70,7 +69,6 @@ def fromMarksWeirdNumbers(theNumberText, quiet=False):
                 converted = -1
                 break
     return good, converted
-
 
 def toMarksWeirdNumbers(theNumber, quiet=False):
     # see MarksWeirdDigits[] for description of strange numbering scheme
@@ -103,7 +101,10 @@ def toMarksWeirdNumbers(theNumber, quiet=False):
 
 
 ###########################################################################
-# Class DlgEnterVidNum
+# Class DlgEnterVidNum - retrieve hand-entered Weird media number
+#   local non-control variables
+#     self.l_returnNumberDec    - decimal number of media entered or else -1
+#     self.l_returnNumberWeird  - weird number of media entered or else "UNKNOWN"
 #   local control variables
 #     self.m_sdbtn_Sizer1Apply     - to hold the "Apply" button
 #     self.m_sdbtn_Sizer1Cancel    - to hold the "Cancel" button
@@ -118,8 +119,8 @@ class DlgEnterVidNum ( wx.Dialog ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition,
                              size = wx.Size( 474,187 ), style = wx.DEFAULT_DIALOG_STYLE )
 
-        self.ReturnNumberWeird = "UNKNOWN"
-        self.ReturnNumberDec = -1
+        self.l_returnNumberWeird = "UNKNOWN"
+        self.l_returnNumberDec = -1
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -174,8 +175,8 @@ class DlgEnterVidNum ( wx.Dialog ):
         # see if this is a valid number; should be one of my weird numbers
         good, retnumberdec = fromMarksWeirdNumbers(nowTextCtrl2)
         if good:
-            self.ReturnNumberWeird = nowTextCtrl2
-            self.ReturnNumberDec = retnumberdec
+            self.l_returnNumberWeird = nowTextCtrl2
+            self.l_returnNumberDec = retnumberdec
             self.Destroy()
         else:
             message = wx.MessageDialog(self, _("%s is not a valid weird number" % nowTextCtrl2),
@@ -185,16 +186,15 @@ class DlgEnterVidNum ( wx.Dialog ):
     # end class DlgEnterVidNum().onDlgBtnEnterVidNumApply()
 
     def onDlgBtnEnterVidNumCancel( self, event ):
-        self.ReturnNumberWeird = "UNKNOWN"
+        self.l_returnNumberWeird = "UNKNOWN"
         self.Destroy()
     # end class DlgEnterVidNum().onDlgBtnEnterVidNumCancel()
-
     # end class DlgEnterVidNum()
 
 
 
 ###########################################################################
-# Class MainFrame
+# Class MainFrame - main class
 #   local non-control variables
 #     self.l_absRunPath             - absolute path we were run from; used to find resources such as the icon
 #     self.l_dbDirName              - path to directory for database (db) text file
@@ -418,11 +418,11 @@ class MainFrame ( wx.Frame ):
         self.m_buttonSofter.Bind( wx.EVT_BUTTON, self.onBtnSofter )
         self.m_textCtrlEntry.Bind( wx.EVT_TEXT_ENTER, self.onTextCtrlEntry )
         self.m_listCtrlVidComments.Bind( wx.EVT_LIST_ITEM_ACTIVATED, self.onListCtrlActivated )
-        self.Bind( wx.EVT_MENU, self.OnFileOpen, id = self.m_menuItemFileOpen.GetId() )
+        self.Bind( wx.EVT_MENU, self.onFileOpen, id = self.m_menuItemFileOpen.GetId() )
         self.Bind( wx.EVT_MENU, self.onFileSave, id = self.m_menuItemFileSave.GetId() )
         self.Bind( wx.EVT_MENU, self.onFileSaveAs, id = self.m_menuItemFileSaveAs.GetId() )
-        self.Bind( wx.EVT_MENU, self.OnFileQuit, id = self.m_menuItemQuit.GetId() )
-        self.Bind( wx.EVT_MENU, self.OnFileExit, id = self.m_menuItemExit.GetId() )
+        self.Bind( wx.EVT_MENU, self.onFileQuit, id = self.m_menuItemQuit.GetId() )
+        self.Bind( wx.EVT_MENU, self.onFileExit, id = self.m_menuItemExit.GetId() )
         self.Bind( wx.EVT_MENU, self.onHelpAbout, id = self.m_menuItemHelpAbout.GetId() )
         self.Bind( wx.EVT_TIMER, self.onTimerMedia, id=wx.ID_ANY )
     # end class MainFrame().__init__()
@@ -490,9 +490,9 @@ class MainFrame ( wx.Frame ):
     def onBtnEnterVidNum( self, event ):
         tmp = DlgEnterVidNum(self)
         tmp.ShowModal()
-        if "UNKNOWN" != tmp.ReturnNumberWeird:
-            self.doLoadupNumMediaFile(mediaWeirdNum=tmp.ReturnNumberWeird,
-                                      statusText="non-text-file %d" % tmp.ReturnNumberDec)
+        if "UNKNOWN" != tmp.l_returnNumberWeird:
+            self.doLoadupNumMediaFile(mediaWeirdNum=tmp.l_returnNumberWeird,
+                                      statusText="non-text-file %d" % tmp.l_returnNumberDec)
     # end class MainFrame().onBtnEnterVidNum()
 
     def onBtnLouder( self, event ):
@@ -570,7 +570,7 @@ class MainFrame ( wx.Frame ):
             self.m_listCtrlVidComments.SetItemBackgroundColour(posn, "yellow")
     # end class MainFrame().doAddListCtrlLine()
 
-    def OnFileOpen(self, event):
+    def onFileOpen(self, event):
         # TODO FIXME Pix vs Movies
         dlg = wx.FileDialog(self, message="Choose a NewMovie.txt file in complete Olson www folder",
                             defaultDir=r'X:\OlsonMedia\DigitalCamera\www_html', defaultFile="*.txt",
@@ -599,7 +599,7 @@ class MainFrame ( wx.Frame ):
             if loadOK:
                 loadOK = self.doLoadupNumMediaFile(mediaWeirdNum=self.l_dbMediaDescripLines[self.l_dbMediaDescripIdx][:5],
                                                    statusText=self.l_dbMediaDescripLines[self.l_dbMediaDescripIdx])
-    # end class MainFrame().OnFileOpen()
+    # end class MainFrame().onFileOpen()
 
     def doGetTxtFileLines(self, fname):
         """Opens text file and reads the lines"""
@@ -819,18 +819,18 @@ class MainFrame ( wx.Frame ):
         dlg = None
     # end class MainFrame().onFileSaveAs()
 
-    def OnFileQuit( self, event ):
+    def onFileQuit( self, event ):
         dlgRslt = wx.MessageBox("Are you sure? This will lose changes", "Are you sure?",
                                 wx.YES|wx.NO|wx.CANCEL|wx.ICON_EXCLAMATION|wx.CENTRE)
         if wx.NO == dlgRslt:
             event.Skip() # OK; just keep going
         else:
             self.Close()
-    # end class MainFrame().OnFileQuit()
+    # end class MainFrame().onFileQuit()
 
-    def OnFileExit( self, event ):
+    def onFileExit( self, event ):
         event.Skip()            # TODO need to write this one
-    # end class MainFrame().OnFileExit()
+    # end class MainFrame().onFileExit()
 
     def onHelpAbout( self, event ):
         event.Skip()            # TODO need to write this one
@@ -838,7 +838,7 @@ class MainFrame ( wx.Frame ):
 
     """TODO FIXME TODO start/stop movie on click in movie window
     def onMouseUpLeftUp( self, event): # if click in movie window, toggle play-stop for movie
-        myX, myY = self.self.m_mediactrl.ScreenToClient(wx.GetMousePosition())
+        myX, myY = self.m_mediactrl.ScreenToClient(wx.GetMousePosition())
         print("myX=%d, myY=%d" % (myX, myY))
         event.Skip()            # TODO need to write this one
     # end class MainFrame().onMouseUpLeftUp()
@@ -871,6 +871,7 @@ class MainFrame ( wx.Frame ):
 ## MAIN PROGRAM
 ###########################################################################
 
-app = wx.App()
-frame = MainFrame(None, os.path.dirname(os.path.realpath(__file__))).Show()
-app.MainLoop()
+if __name__ == "__main__":
+    app = wx.App()
+    frame = MainFrame(None, os.path.dirname(os.path.realpath(__file__))).Show()
+    app.MainLoop()

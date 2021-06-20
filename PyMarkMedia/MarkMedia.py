@@ -266,7 +266,10 @@ class MainFrame ( wx.Frame ):
         self.l_listCtrlSlctd = {"prev": "_0001", "curr": "_0001"}
         self.l_textCtrlEntry_unchanged = ""
         self.l_useMdoMediaCtrls = True # ShowPlayerControls does not seem to work
-        
+        self.l_dbFileName = ""
+        self.l_dbDirName = ""
+        self.l_rootDir = ""
+
         self.SetIcon(wx.Icon(os.path.join(self.l_absRunPath,"MadScience_256.ico"))) # Mark: set icon
 
         bSizerFrame = wx.BoxSizer( wx.VERTICAL )
@@ -284,8 +287,14 @@ class MainFrame ( wx.Frame ):
 
         bSizerPanel.Add( self.m_staticTextStatus, 0, wx.ALL|wx.EXPAND, 5 )
         self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ))
+        # self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ), szBackend=wx.media.MEDIABACKEND_DIRECTSHOW)
+        # self.m_mediactrl = wx.media.MediaCtrl(self, style=wx.SIMPLE_BORDER, size=wx.Size( 800,800 ), szBackend=wx.media.MEDIABACKEND_WMP10)
         if not self.l_useMdoMediaCtrls:
-            self.m_mediactrl.ShowPlayerControls(flags=wx.media.MEDIACTRLPLAYERCONTROLS_DEFAULT) # does not seem to work
+            # Currently only implemented on the QuickTime and DirectShow backends. The function returns True on success
+            # if not self.m_mediactrl.ShowPlayerControls(flags=wx.media.MEDIACTRLPLAYERCONTROLS_STEP):
+            if not self.m_mediactrl.ShowPlayerControls(flags=wx.media.MEDIACTRLPLAYERCONTROLS_DEFAULT): # does not seem to work
+                # it claims that it worked but there are no working controls
+                print("ShowPlayerControls() failed")
         bSizerPanel.Add( self.m_mediactrl, 1, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
@@ -436,7 +445,7 @@ class MainFrame ( wx.Frame ):
 
     # Virtual event handlers
     def onBtnPrevFile( self, event ):
-        possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
+        possibleIdx = self.doFindDirecTextFileUsableLine(-1)
         if possibleIdx >= 0:
             self.l_dbMediaDescripIdx = possibleIdx
             ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.l_dbMediaDescripLines[self.l_dbMediaDescripIdx][:5],
@@ -480,7 +489,7 @@ class MainFrame ( wx.Frame ):
 
 
     def onBtnNextFile( self, event ):
-        possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(+1)
+        possibleIdx = self.doFindDirecTextFileUsableLine(+1)
         if possibleIdx >= 0:
             self.l_dbMediaDescripIdx = possibleIdx
             ignore = self.doLoadupNumMediaFile( mediaWeirdNum = self.l_dbMediaDescripLines[self.l_dbMediaDescripIdx][:5],
@@ -530,7 +539,6 @@ class MainFrame ( wx.Frame ):
                break
             myX -= colWidth
         print("myRow=%d myCol=%d" % (myRow, myCol))
-        numCols = self.m_listCtrlVidComments.GetColumnCount()  # actually I know there are just two
         textNum = self.m_listCtrlVidComments.GetItemText(myRow,0)
         textString = self.m_listCtrlVidComments.GetItemText(myRow,1)
         # print("item=|%s| |%s|" % (textNum, textString))

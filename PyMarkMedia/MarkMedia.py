@@ -110,7 +110,7 @@ def toMarksWeirdNumbers(theNumber, quiet=False):
 #     self.m_sdbtn_Sizer1Cancel    - to hold the "Cancel" button
 #     self.m_staticTextDlgEnterVidNum       - static text telling how to enter video number
 #     self.m_staticTextDlgEnterVidNumStatus - static text telling what dialog is doing or waiting for
-#     self.m_textCtrl2             - text control that user types into
+#     self.m_textCtrlEnterNum      - text control that user types Weird number into
 ###########################################################################
 
 class DlgEnterVidNum ( wx.Dialog ):
@@ -134,8 +134,8 @@ class DlgEnterVidNum ( wx.Dialog ):
 
         bSizer4.Add( self.m_staticTextDlgEnterVidNum, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
-        self.m_textCtrl2 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer4.Add( self.m_textCtrl2, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+        self.m_textCtrlEnterNum = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, size=wx.DefaultSize, style = wx.TE_PROCESS_ENTER)
+        bSizer4.Add( self.m_textCtrlEnterNum, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
         self.m_staticTextDlgEnterVidNumStatus =\
             wx.StaticText( self, wx.ID_ANY, _(u"Status: waiting for entry..."),
@@ -163,23 +163,24 @@ class DlgEnterVidNum ( wx.Dialog ):
         # Connect Events
         self.m_sdbtn_Sizer1Apply.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumApply )
         self.m_sdbtn_Sizer1Cancel.Bind( wx.EVT_BUTTON, self.onDlgBtnEnterVidNumCancel )
+        self.Bind(wx.EVT_TEXT_ENTER, self.onDlgBtnEnterVidNumApply)
     # end class DlgEnterVidNum().__init__()
 
     def __del__( self ):
         pass
     # end class DlgEnterVidNum().__del__()
 
-    # Virtual event handlers, override them in your derived class
+    # Virtual event handlers
     def onDlgBtnEnterVidNumApply( self, event ):
-        nowTextCtrl2 = self.m_textCtrl2.GetValue() # MDO_Here
+        typedNumWeird = self.m_textCtrlEnterNum.GetValue()
         # see if this is a valid number; should be one of my weird numbers
-        good, retnumberdec = fromMarksWeirdNumbers(nowTextCtrl2)
+        good, typedNumDec = fromMarksWeirdNumbers(typedNumWeird)
         if good:
-            self.l_returnNumberWeird = nowTextCtrl2
-            self.l_returnNumberDec = retnumberdec
+            self.l_returnNumberWeird = typedNumWeird
+            self.l_returnNumberDec = typedNumDec
             self.Destroy()
         else:
-            message = wx.MessageDialog(self, _("%s is not a valid weird number" % nowTextCtrl2),
+            message = wx.MessageDialog(self, _("%s is not a valid weird number" % typedNumWeird),
                                        _("ERROR"), wx.OK | wx.ICON_ERROR)
             message.ShowModal()
             message.Destroy()
@@ -433,7 +434,7 @@ class MainFrame ( wx.Frame ):
     # end class MainFrame().__del__()
 
 
-    # Virtual event handlers, override them in your derived class
+    # Virtual event handlers
     def onBtnPrevFile( self, event ):
         possibleIdx = m_txtFileIdx = self.doFindDirecTextFileUsableLine(-1)
         if possibleIdx >= 0:

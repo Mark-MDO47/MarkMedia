@@ -50,7 +50,7 @@ def fromMarksWeirdNumbers(theNumberText, quiet=False):
     elif len(theNumberText) < 5:
         if quiet is False:
             ignore = wx.MessageBox(
-                "ERROR: string |%s| is too short; must be >= 5 - inside fromMarksWeirdNumbers()" % (theNumberText),
+                "ERROR: string |%s| is too short; must be >= 5 - inside fromMarksWeirdNumbers()" % theNumberText,
                 "Bad Inputs", wx.ICON_EXCLAMATION | wx.CENTRE)
     theNumberText = theNumberText.upper()
     good = True
@@ -239,7 +239,8 @@ class DlgEnterVidNum ( wx.Dialog ):
 #     self.m_panel1              - video is displayed here
 #     self.m_staticTextStatus    - info about video being displayed
 #     self.m_textCtrlEntry       - enter/edit video comment here
-#     self.m_timerMedia          - timer needed to move a few seconds into movie so not blank screen
+#     self.m_timerMedia          - timer needed to move a few milliseconds into movie so not blank screen
+#                                       see also self.l_mediaStartStopDisplay
 #
 #  to get list of l_ or m_
 #    grep "self.l_.*[=]" MarkMedia.py | sed "s?self.l_?\nself.l_?g" | grep self.l_ | sed "s?[ ,\[\()].*??" | sort | uniq
@@ -251,7 +252,6 @@ class MainFrame ( wx.Frame ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition,
                             size = wx.Size( 1245,1193 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
-        # inserted by aftercopyfilefrom to be copied after "wx.Frame.__init__"
         self.l_absRunPath = absRunPath # absolute path we were run from
         self.l_dbMediaDescripPath = "UNKNOWN" # absolute path to open text file
         self.l_dbMediaDescripLines = []       # lines for open text file, stripped
@@ -543,7 +543,7 @@ class MainFrame ( wx.Frame ):
         textString = self.m_listCtrlVidComments.GetItemText(myRow,1)
         # print("item=|%s| |%s|" % (textNum, textString))
         good = False
-        if (len(textNum) >= 5):
+        if len(textNum) >= 5:
             good, ignore = fromMarksWeirdNumbers(textNum)
         if good:
             self.doLoadupNumMediaFile( mediaWeirdNum = textNum, statusText = "load %s" % textNum )
@@ -801,7 +801,7 @@ class MainFrame ( wx.Frame ):
                 if mediaFlag:
                     fPtr.write("%s %s\n" % (textNum, textString))
                 else:
-                    fPtr.write("%s\n" % (textString))
+                    fPtr.write("%s\n" % textString)
             fPtr.close()
             fPtr = None
         except:
@@ -820,7 +820,7 @@ class MainFrame ( wx.Frame ):
     def onFileSaveAs( self, event ):
         dlg = None
         dlg = wx.FileDialog(self, "Save to file:", ".", "", "Text (*.txt)|*.txt", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if (dlg.ShowModal() == wx.ID_OK):
+        if dlg.ShowModal() == wx.ID_OK:
             self.l_dbFileName = dlg.GetFilename()
             self.l_dbDirName = dlg.GetDirectory()
             self.writeMediaFile()

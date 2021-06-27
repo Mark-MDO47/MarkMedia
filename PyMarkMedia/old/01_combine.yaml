@@ -1,0 +1,65 @@
+cmds:
+- - afteraddtext
+  - 'coding: utf-8'
+  - '
+
+    import sys
+
+    import os
+
+    import time
+
+    from time import sleep
+
+    '
+  - unused
+- - afterskipto
+  - '## http://www.wxformbuilder.org/'
+  - '#################################'
+  - unused
+- - aftercopyfilefrom
+  - import wx.xrc
+  - import gettext
+  - _00_DialogEnterVidNum.py
+- - afterskippastcopyentirefilefrom
+  - 'class MainFrame ( '
+  - def __init__( self, parent )
+  - _01_FrameInit_def.py
+- - afterskippastcopyentirefilefrom
+  - wx.Frame.__init__ (
+  - self.SetSizeHints(
+  - _01_FrameInit.py
+- - afterskipto
+  - bSizerPanel.Add( self.m_staticTextStatus,
+  - bSizer3 = wx.BoxSizer(
+  - unused
+- - aftercopyfilefrom
+  - self.m_listCtrlVidComments.SetMinSize(
+  - '# start copying here'
+  - _01_listCtrlInit.py
+- - afteraddtext
+  - def __del__( self
+  - '        del self.m_mediactrl
+
+    '
+  - unused
+- - atendaddtext
+  - unused
+  - '###########################################################################
+
+    ## MAIN PROGRAM
+
+    ###########################################################################
+
+
+    app = wx.App()
+
+    frame = MainFrame(None, os.path.dirname(os.path.realpath(__file__))).Show()
+
+    app.MainLoop()
+
+    '
+  - unused
+events: []
+inpFile: _00_MarkMedia.py
+otpFile: _01_MarkMedia.py

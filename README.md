@@ -9,7 +9,7 @@ At this point it is easier just to make a dialog using wxFormBuilder and hand-ed
 ![alt text](https://github.com/Mark-MDO47/MarkMedia/blob/master/PyMarkMedia.png "MarkMedia in action")
 
 ## Flow - Originally
-I put all the original flow stuff into the old/ directoyr
+I put all the original flow stuff into the old/ directory
 
 The script combine.sh adds my changes (events, merges, etc.) to wxFormBuilder input.
 This allows me to iterate on both wxFormBuilder and on my additions.
